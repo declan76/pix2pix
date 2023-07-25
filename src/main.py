@@ -23,8 +23,10 @@ def main():
     test_dataset = Dataset(data_loader, BUFFER_SIZE, BATCH_SIZE).create_dataset("test")
 
     # Create the generator and discriminator
-    generator = Generator().build_model()
-    discriminator = Discriminator().build_model()
+    generator = Generator()
+    generator.build_model()
+    discriminator = Discriminator()
+    discriminator.build_model()
 
     # Create the trainer
     log_dir = "./logs/"

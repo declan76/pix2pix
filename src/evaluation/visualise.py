@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 def generate_images(model, test_input, tar):
-    prediction = model(test_input, training=True)
+    prediction = model.model(test_input, training=True)
     plt.figure(figsize=(15, 15))
 
     display_list = [test_input[0], tar[0], prediction[0]]

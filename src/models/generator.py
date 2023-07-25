@@ -105,10 +105,10 @@ class Generator:
 
         x = last(x)
 
-        return tf.keras.Model(inputs=inputs, outputs=x)
+        self.model = tf.keras.Model(inputs=inputs, outputs=x)
 
-    @staticmethod
-    def generator_loss(disc_generated_output, gen_output, target):
+
+    def generator_loss(self, disc_generated_output, gen_output, target):
         gan_loss = Generator.loss_object(
             tf.ones_like(disc_generated_output), disc_generated_output
         )

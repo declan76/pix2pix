@@ -1,5 +1,5 @@
 import tensorflow as tf
-from .data_loader import DataLoader
+from data.data_loader import DataLoader
 
 
 class Dataset:

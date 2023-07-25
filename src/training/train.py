@@ -1,9 +1,9 @@
 import tensorflow as tf
 import time
 from IPython import display
-from src.models.generator import Generator
-from src.models.discriminator import Discriminator
-from src.evaluation.visualise import generate_images
+from models.generator import Generator
+from models.discriminator import Discriminator
+from evaluation.visualise import generate_images
 
 class Trainer:
     def __init__(self, generator: Generator, discriminator: Discriminator, summary_writer, checkpoint_prefix):
@@ -15,29 +15,25 @@ class Trainer:
         self.checkpoint_prefix = checkpoint_prefix
         self.checkpoint = tf.train.Checkpoint(generator_optimizer=self.generator_optimizer,
                                               discriminator_optimizer=self.discriminator_optimizer,
-                                              generator=self.generator,
-                                              discriminator=self.discriminator)
+                                              generator=self.generator.model,
+                                              discriminator=self.discriminator.model)
 
     @tf.function
     def train_step(self, input_image, target, step):
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            gen_output = self.generator(input_image, training=True)
+            gen_output = self.generator.model(input_image, training=True)
 
-            disc_real_output = self.discriminator([input_image, target], training=True)
-            disc_generated_output = self.discriminator([input_image, gen_output], training=True)
+            disc_real_output = self.discriminator.model([input_image, target], training=True)
+            disc_generated_output = self.discriminator.model([input_image, gen_output], training=True)
 
             gen_total_loss, gen_gan_loss, gen_l1_loss = self.generator.generator_loss(disc_generated_output, gen_output, target)
             disc_loss = self.discriminator.discriminator_loss(disc_real_output, disc_generated_output)
 
-        generator_gradients = gen_tape.gradient(gen_total_loss,
-                                                self.generator.trainable_variables)
-        discriminator_gradients = disc_tape.gradient(disc_loss,
-                                                     self.discriminator.trainable_variables)
+        generator_gradients = gen_tape.gradient(gen_total_loss, self.generator.model.trainable_variables)
+        discriminator_gradients = disc_tape.gradient(disc_loss, self.discriminator.model.trainable_variables)
 
-        self.generator_optimizer.apply_gradients(zip(generator_gradients,
-                                                     self.generator.trainable_variables))
-        self.discriminator_optimizer.apply_gradients(zip(discriminator_gradients,
-                                                         self.discriminator.trainable_variables))
+        self.generator_optimizer.apply_gradients(zip(generator_gradients, self.generator.model.trainable_variables))
+        self.discriminator_optimizer.apply_gradients(zip(discriminator_gradients, self.discriminator.model.trainable_variables))
 
         with self.summary_writer.as_default():
             tf.summary.scalar('gen_total_loss', gen_total_loss, step=step//1000)

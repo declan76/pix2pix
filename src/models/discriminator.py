@@ -61,10 +61,10 @@ class Discriminator:
             zero_pad2
         )  # (batch_size, 30, 30, 1)
 
-        return tf.keras.Model(inputs=[inp, tar], outputs=last)
+        self.model = tf.keras.Model(inputs=[inp, tar], outputs=last)
 
-    @staticmethod
-    def discriminator_loss(disc_real_output, disc_generated_output):
+
+    def discriminator_loss(self, disc_real_output, disc_generated_output):
         real_loss = Discriminator.loss_object(
             tf.ones_like(disc_real_output), disc_real_output
         )
