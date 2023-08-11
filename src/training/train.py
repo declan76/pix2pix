@@ -1,6 +1,8 @@
+import datetime
 import tensorflow as tf
 import time
 from IPython import display
+from prettytable import PrettyTable
 from models.generator import Generator
 from models.discriminator import Discriminator
 from evaluation.visualise import generate_images
@@ -17,6 +19,12 @@ class Trainer:
                                               discriminator_optimizer=self.discriminator_optimizer,
                                               generator=self.generator.model,
                                               discriminator=self.discriminator.model)
+        # Initialize loss attributes
+        self.gen_total_loss = None
+        self.gen_gan_loss = None
+        self.gen_l1_loss = None
+        self.disc_loss = None
+
 
     @tf.function
     def train_step(self, input_image, target, step):
@@ -41,23 +49,46 @@ class Trainer:
             tf.summary.scalar('gen_l1_loss', gen_l1_loss, step=step//1000)
             tf.summary.scalar('disc_loss', disc_loss, step=step//1000)
 
+        return gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss
+
+
     def fit(self, train_ds, test_ds, steps):
         example_input, example_target = next(iter(test_ds.take(1)))
         start = time.time()
 
+        # Initialize the run_timestamp variable before the training loop
+        run_timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
         for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
+            gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss = self.train_step(input_image, target, step)
             if (step) % 1000 == 0:
                 display.clear_output(wait=True)
 
-                if step != 0:
-                    print(f'Time taken for 1000 steps: {time.time()-start:.2f} sec\n')
+                # Extracting the losses for printing
+                gen_total_loss_value = gen_total_loss.numpy()
+                gen_gan_loss_value = gen_gan_loss.numpy()
+                gen_l1_loss_value = gen_l1_loss.numpy()
+                disc_loss_value = disc_loss.numpy()
 
+                # Time taken for the last 1k steps
+                time_taken = time.time() - start
                 start = time.time()
 
-                generate_images(self.generator, example_input, example_target)
-                print(f"Step: {step//1000}k")
+                # Create a table using PrettyTable
+                table = PrettyTable()
+                table.field_names = ["Metric", "Value"]
+                table.add_row(["Step", f"{step//1000}k"])
+                table.add_row(["Time taken for last 1k steps", f"{time_taken:.2f} sec"])
+                table.add_row(["Generator Total Loss", f"{gen_total_loss_value:.4f}"])
+                table.add_row(["Generator GAN Loss", f"{gen_gan_loss_value:.4f}"])
+                table.add_row(["Generator L1 Loss", f"{gen_l1_loss_value:.4f}"])
+                table.add_row(["Discriminator Loss", f"{disc_loss_value:.4f}"])
 
-            self.train_step(input_image, target, step)
+                print(table)
+                print("\n")
+
+                # Call the generate_images function with the run_timestamp
+                generate_images(self.generator, example_input, example_target, step, run_timestamp)
 
             # Training step
             if (step+1) % 10 == 0:
@@ -66,3 +97,4 @@ class Trainer:
             # Save (checkpoint) the model every 5k steps
             if (step + 1) % 5000 == 0:
                 self.checkpoint.save(file_prefix=self.checkpoint_prefix)
+

@@ -1,8 +1,11 @@
-logs/
-
 .vscode/
 
 __pycache__
 
+logs/
+
 venv/
 
+training_checkpoints/
+
+generated_images/
