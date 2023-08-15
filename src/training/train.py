@@ -59,42 +59,68 @@ class Trainer:
         # Initialize the run_timestamp variable before the training loop
         run_timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-        for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
-            gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss = self.train_step(input_image, target, step)
-            if (step) % 1000 == 0:
-                display.clear_output(wait=True)
 
-                # Extracting the losses for printing
-                gen_total_loss_value = gen_total_loss.numpy()
-                gen_gan_loss_value = gen_gan_loss.numpy()
-                gen_l1_loss_value = gen_l1_loss.numpy()
-                disc_loss_value = disc_loss.numpy()
 
-                # Time taken for the last 1k steps
-                time_taken = time.time() - start
-                start = time.time()
+        # Add this before the training loop in the `fit` method of the `Trainer` class
+        print("Checking dataset structure and shapes...")
+        for input_image, target in train_ds.take(5):
+            print("Input Image Shape:", input_image.shape)
+            print("Target Shape:", target.shape)
+        print("Done checking dataset.")
 
-                # Create a table using PrettyTable
-                table = PrettyTable()
-                table.field_names = ["Metric", "Value"]
-                table.add_row(["Step", f"{step//1000}k"])
-                table.add_row(["Time taken for last 1k steps", f"{time_taken:.2f} sec"])
-                table.add_row(["Generator Total Loss", f"{gen_total_loss_value:.4f}"])
-                table.add_row(["Generator GAN Loss", f"{gen_gan_loss_value:.4f}"])
-                table.add_row(["Generator L1 Loss", f"{gen_l1_loss_value:.4f}"])
-                table.add_row(["Discriminator Loss", f"{disc_loss_value:.4f}"])
 
-                print(table)
-                print("\n")
+        # Add this before the training loop in the `fit` method of the `Trainer` class
+        total_batches = tf.data.experimental.cardinality(train_ds).numpy()
+        print(f"Total batches in dataset: {total_batches}")
+        print(f"Steps for training: {steps}")
 
-                # Call the generate_images function with the run_timestamp
-                generate_images(self.generator, example_input, example_target, step, run_timestamp)
 
-            # Training step
-            if (step+1) % 10 == 0:
-                print('.', end='', flush=True)
 
-            # Save (checkpoint) the model every 5k steps
-            if (step + 1) % 5000 == 0:
-                self.checkpoint.save(file_prefix=self.checkpoint_prefix)
+        # Modify the training loop in the `fit` method of the `Trainer` class
+        try:
+            for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
+                gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss = self.train_step(input_image, target, step)
+                if (step) % 1000 == 0:
+                    display.clear_output(wait=True)
+
+                    # Extracting the losses for printing
+                    gen_total_loss_value = gen_total_loss.numpy()
+                    gen_gan_loss_value = gen_gan_loss.numpy()
+                    gen_l1_loss_value = gen_l1_loss.numpy()
+                    disc_loss_value = disc_loss.numpy()
+
+                    # Time taken for the last 1k steps
+                    time_taken = time.time() - start
+                    start = time.time()
+
+                    # Create a table using PrettyTable
+                    table = PrettyTable()
+                    table.field_names = ["Metric", "Value"]
+                    table.add_row(["Step", f"{step//1000}k"])
+                    table.add_row(["Time taken for last 1k steps", f"{time_taken:.2f} sec"])
+                    table.add_row(["Generator Total Loss", f"{gen_total_loss_value:.4f}"])
+                    table.add_row(["Generator GAN Loss", f"{gen_gan_loss_value:.4f}"])
+                    table.add_row(["Generator L1 Loss", f"{gen_l1_loss_value:.4f}"])
+                    table.add_row(["Discriminator Loss", f"{disc_loss_value:.4f}"])
+
+                    print(table)
+                    print("\n")
+
+                    # Call the generate_images function with the run_timestamp
+                    generate_images(self.generator, example_input, example_target, step, run_timestamp)
+
+                # Training step
+                if (step+1) % 10 == 0:
+                    print('.', end='', flush=True)
+
+                # Save (checkpoint) the model every 5k steps
+                if (step + 1) % 5000 == 0:
+                    self.checkpoint.save(file_prefix=self.checkpoint_prefix)
+        except Exception as e:
+            print(f"Error encountered at step {step}.")
+            print(f"Input Image Shape: {input_image.shape}")
+            print(f"Target Shape: {target.shape}")
+            raise e  # re-raise the exception to see the traceback
+
+
 
