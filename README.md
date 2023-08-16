@@ -75,15 +75,15 @@ For a detailed installation guide, refer to the official Docker documentation [h
 
 ---
 
-#### Mac
+#### macOS
 For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/desktop/install/mac-install/).
 
 ---
 
 ### Setup
-#### CPU-Only Environments on Ubuntu and Debian-based Linux Distros
+#### CPU-Only Environments on Linux, Windows, and macOS
 ##### 1. Create a Docker Image from the Dockerfile
-**Note**: Uncomment "FROM tensorflow/tensorflow:2.13.0" in the Dockerfile, and comment out "FROM tensorflow/tensorflow:2.13.0-gpu" if you are using a CPU-only environment.
+**Note**: Uncomment "FROM tensorflow/tensorflow:2.13.0" in the Dockerfile, and comment out "FROM tensorflow/tensorflow:2.13.0-gpu".
 - Navigate to the directory containing the Dockerfile:
     ```
     cd /path/to/dockerfile
@@ -94,11 +94,16 @@ For a detailed installation guide, refer to the official Docker documentation [h
     ```
     This command builds a Docker image named pix2pix-cpu-image from the Dockerfile in the current directory.
 ##### 2. Build Docker Container from the Image
-- To build a Docker container from the image:
+To build a Docker container from the image:
+- **Linux**:
     ```
     docker run -it --net=host --name pix2pix-cpu-container -v $(pwd):/app pix2pix-cpu-image bash
     ```
-    This command creates a Docker container named pix2pix-cpu-container from the pix2pix-cpu-image image and runs it in interactive mode with the host network and all GPUs enabled. It also mounts the current directory to the /app directory in the container.
+- **Windows and macOS**:
+    ```
+    docker run -it --name pix2pix-cpu-container -v $(pwd):/app pix2pix-cpu-image bash
+    ```
+This command creates a Docker container named pix2pix-cpu-container from the pix2pix-cpu-image image and runs it in interactive mode. It also mounts the current directory to the /app directory in the container.
 
 ---
 
@@ -180,7 +185,7 @@ For a detailed walkthrough, refer to the official NVIDIA guide [here](https://do
     ```
 
 ##### 5. Build Docker Container
-**Note**: Uncomment "FROM tensorflow/tensorflow:2.13.0-gpu" in the Dockerfile, and comment out "FROM tensorflow/tensorflow:2.13.0" if you are using a GPU-accelerated environment.
+**Note**: Uncomment "FROM tensorflow/tensorflow:2.13.0-gpu" in the Dockerfile, and comment out "FROM tensorflow/tensorflow:2.13.0".
 ###### 5.1. Create a Docker Image from the Dockerfile
 - Navigate to the directory containing the Dockerfile:
     ```
