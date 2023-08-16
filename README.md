@@ -43,17 +43,6 @@ Before you install Docker Engine for the first time on a new host machine, you n
     ```
     sudo apt-get update
     ```
-
-#### Windows
-For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/desktop/install/windows-install/).
-
----
-
-#### Mac
-For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/desktop/install/mac-install/).
-
----
-
 ###### 3. Install Docker Engine
 - Now, install Docker Engine along with some additional packages:
     ```
@@ -79,6 +68,15 @@ If you encounter errors when trying to run Docker without sudo, it's due to the 
   ```
   docker run hello-world
   ```
+---
+  
+#### Windows
+For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/desktop/install/windows-install/).
+
+---
+
+#### Mac
+For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/desktop/install/mac-install/).
 
 ---
 
