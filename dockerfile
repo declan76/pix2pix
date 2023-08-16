@@ -1,7 +1,9 @@
-# Use an official Python runtime as a parent image
-# FROM python:3.11.4
-
+# Use an official Tensorflow runtime as a parent image. 
+# Comment out either the GPU or CPU version depending on your system.
+# FOR GPU VERSION: 
 FROM tensorflow/tensorflow:2.13.0-gpu
+# FOR CPU VERSION:
+# FROM tensorflow/tensorflow:2.13.0
 
 # Set the working directory to /app
 WORKDIR /app
@@ -14,7 +16,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 6006 available to the world outside this container
 EXPOSE 6006
-
-# Run main.py when the container launches
-# CMD ["python", "src/main.py"]
-
