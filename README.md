@@ -5,6 +5,10 @@
   > Isola, P., Zhu, J. Y., Zhou, T., & Efros, A. A. (2017). Image-to-image translation with conditional adversarial networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1125-1134).
 
 ## Docker 
+**Visual Studio Code**:  While not mandatory, it is a versatile Integrated Development Environment (IDE) that offers a Docker extension, simplifying many Docker-related tasks.
+- Download Visual Studio Code [here](https://code.visualstudio.com/download).
+- Access its Docker extension [here](https://code.visualstudio.com/docs/containers/overview).
+
 ### Installation
 #### Ubuntu and Debian-based Linux Distros
 For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/engine/install/ubuntu/). 
@@ -112,9 +116,6 @@ This command creates a Docker container named pix2pix-cpu-container from the pix
 
 ##### Prerequisites
 - **NVIDIA Drivers**: Before you get started, make sure you have installed the NVIDIA driver for your Linux distribution. The recommended way to install drivers is to use the package manager for your distribution but other installer mechanisms are also available (e.g. by downloading .run installers from NVIDIA Driver Downloads).
-- **Visual Studio Code**:  While not mandatory, it is a versatile Integrated Development Environment (IDE) that offers a Docker extension, simplifying many Docker-related tasks.
-    - Download Visual Studio Code [here](https://code.visualstudio.com/download).
-    - Access its Docker extension [here](https://code.visualstudio.com/docs/containers/overview).
 
 ###### 1. NVIDIA Container Toolkit Installation
 For a detailed walkthrough, refer to the official NVIDIA guide [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#nvidia-drivers).
