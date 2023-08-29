@@ -19,16 +19,6 @@ def read_fits(file_path, file_path_str=None):
 
     return data
 
-
-def process_fits_data(data, channels=3):
-    """
-    Process the FITS data to fit into the required channels.
-    For now, we'll duplicate the data for all channels.
-    """
-    processed_data = tf.stack([data] * channels, axis=-1)
-    return processed_data
-
-
 def display_fits_image(file_path_str):
     with fits.open(file_path_str) as hdul:
         for i, hdu in enumerate(hdul):
@@ -40,5 +30,4 @@ def display_fits_image(file_path_str):
                 plt.colorbar()
                 # plt.show() 
                 plt.savefig(f"./data_set/images/{file_path_str.name}_{i}.png")
-
 
