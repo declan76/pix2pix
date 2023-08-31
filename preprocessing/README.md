@@ -8,6 +8,8 @@ There are two scripts available to preprocess the data:
 1. `single_fits_processor.py`: Duplicate a single FITS file to create a three-channel image.
 2. `three_fits_processor.py`: Combine three different FITS files to create a three-channel image.
 
+**Important Note**: When running the code inside a Docker container, please ensure that you use relative paths for any file or directory references. Absolute paths that work on your local machine might not be recognized correctly within the Docker container environment. Using relative paths will ensure consistent behavior and prevent potential file not found errors.
+
 ### Why Preprocessing is Essential for pix2pix
 
 The pix2pix model requires input data to be in a specific format:
@@ -48,3 +50,23 @@ The script uses one file for each channel: magnetogram, intensity, and divergenc
 The data is cropped to a size of 256x256 pixels.
 The processed data cube is saved in a new directory with a filename indicating the active region and time interval.
 Additional functions are provided to calculate the distance to the disk center and to remove a 2D plane from the data.
+
+# Pair Generation
+
+#### Filename: `pair_files.py``
+
+This script is designed to process a directory of files with specific naming conventions related to active regions (AR) and time intervals (TI). It pairs files based on consecutive time intervals for the same active region and outputs the pairs to a CSV file. The primary motivation behind this pairing is to prepare input-target image pairs for the pix2pix image-to-image translation model.
+
+#### pix2pix Model Context
+
+The pix2pix model requires paired data for training, where each pair consists of an input image and a corresponding target (or real) image. This script aids in generating such pairs.
+
+#### Naming Convention
+
+Files should be named with an active region label (e.g., AR11158) and a time interval (e.g., TI+04, TI-4, or TI4). The script identifies and extracts these components from the filenames to determine the appropriate file pairs.
+
+#### How It Works
+
+1. **File Parsing**: The script scans the provided directory and uses regular expressions to extract the active region and time interval from each filename.
+2. **Pairing Logic**: Files are grouped by their active region. Within each group, files are paired based on consecutive time intervals. For instance, if time intervals 1, 2, 3, and 4 are present for a specific active region, the pairs would be 1-2, 2-3, and 3-4. The script also ensures that the time intervals are in the correct order (e.g., 1-2, not 2-1). If a time interval is missing, the script will skip that pairing. For example, if the time intervals 1, 2, and 4 are present, the pairs would be 1-2, but the pairing 2-4 would be skipped because 3 is missing.
+3. **CSV Output**: The identified file pairs are written to a CSV file. Each row in the CSV contains two filenames representing a pair: the first file is the input image, and the second file is the target/real image for the pix2pix model.

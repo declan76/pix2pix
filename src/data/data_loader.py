@@ -1,78 +1,62 @@
-import tensorflow as tf
-import tensorflow_probability as tfp
+import shutil
 import pathlib
+import pandas as pd
+import tensorflow as tf
 from utils.fits_handler import read_fits
 
 class DataLoader:
-    def __init__(self, dataset_name):
-        self.dataset_name = dataset_name
-        self.PATH = pathlib.Path(dataset_name)
-    
+    def __init__(self, dataset_directory, csv_path):
+        self.dataset_directory = pathlib.Path(dataset_directory)
+        # Read the CSV file into a DataFrame
+        self.pairs = pd.read_csv(csv_path)
+        # Shuffle the rows of the DataFrame
+        self.pairs = self.pairs.sample(frac=1).reset_index(drop=True)
+
+
+    def load(self, image_file):
+        if not image_file.endswith('.fits'):
+            image_file += '.fits'
+        image_file_path = self.dataset_directory / image_file
+        data = tf.py_function(func=self._load_image, inp=[str(image_file_path)], Tout=tf.float32)
+        return tf.convert_to_tensor(data, dtype=tf.float32)
+
+    def _load_image(self, image_file_path_tensor):
+        image_file_path = image_file_path_tensor.numpy().decode('utf-8')
+        data = read_fits(image_file_path)
+        if data is None:
+            print(f"Data is None for file: {image_file_path}")
+        return data
+
+    def load_image_pair(self, index_tensor):
+        index = index_tensor.numpy()  # Convert tensor to numpy array
+        input_image_name, real_image_name = self.pairs.iloc[int(index)]  # Convert numpy array to integer
+        input_image = self.load(input_image_name)
+        real_image = self.load(real_image_name)
+        return input_image, real_image
+
     @staticmethod
-    def split_data(dataset_path, train_path, test_path, train_ratio=0.8):
+    def split_data(dataset_path, train_path, test_path, csv_path, train_ratio=0.8):
         dataset_path_obj = pathlib.Path(dataset_path)
         train_path_obj = pathlib.Path(train_path)
         test_path_obj = pathlib.Path(test_path)
-        
-        all_files = sorted(list(dataset_path_obj.glob("*.fits")))
-        total_files = len(all_files)
-        
-        # Split the dataset into training and testing sets
-        train_size = int(train_ratio * total_files)
-        train_files = all_files[:train_size]
-        test_files = all_files[train_size:]
-        
-        # Move the files to the respective directories
-        for file in train_files:
-            file.rename(train_path_obj / file.name)
-        for file in test_files:
-            file.rename(test_path_obj / file.name)
 
-    def load(self, image_file):
-        # Directly load the image using the provided file path
-        image_file_str = tf.strings.as_string(image_file, precision=-1, scientific=False, shortest=False, width=-1)
+        # Read the CSV file into a DataFrame and shuffle the pairs
+        pairs = pd.read_csv(csv_path, header=None)  
+        pairs = pairs.sample(frac=1).reset_index(drop=True)
 
-        # Read the image using tf.py_function
-        data = tf.py_function(
-            func=self._load_image, 
-            inp=[image_file_str], 
-            Tout=tf.float32
-        )
+        # Split the shuffled pairs DataFrame into training and testing datasets
+        train_size = int(train_ratio * len(pairs))
+        train_pairs = pairs.iloc[:train_size]
+        test_pairs = pairs.iloc[train_size:]
 
-        # Convert to tensor
-        input_image = tf.convert_to_tensor(data, dtype=tf.float32)
+        # Copy the files based on the split pairs to train and test directories
+        for _, row in train_pairs.iterrows():
+            shutil.copy(dataset_path_obj / row.iloc[0], train_path_obj / row.iloc[0])   # Use iloc
+            shutil.copy(dataset_path_obj / row.iloc[1], train_path_obj / row.iloc[1])   # Use iloc
 
-        return input_image
+        for _, row in test_pairs.iterrows():
+            shutil.copy(dataset_path_obj / row.iloc[0], test_path_obj / row.iloc[0])    # Use iloc
+            shutil.copy(dataset_path_obj / row.iloc[1], test_path_obj / row.iloc[1])    # Use iloc
 
-    def _load_image(self, image_file_str):
-        data = read_fits(image_file_str)
-        
-        if data is None:
-            print(f"Data is None for file: {image_file_str}")
-        
-        return data
+        return train_pairs, test_pairs
 
-    def load_image_train(self, image_files):
-        image_file = image_files[0]
-        next_image_file = image_files[1]
-
-        input_image = self.load(image_file)
-        real_image = self.load(next_image_file)
-
-        if input_image is None or real_image is None:
-            raise ValueError(f"Error: Input or real image is None for files: {image_files}")
-        
-        return input_image, real_image
-
-    def load_image_test(self, image_files):
-        image_file = image_files[0]
-        next_image_file = image_files[1]
-
-        input_image = self.load(image_file)
-        real_image = self.load(next_image_file)
-
-        if input_image is None or real_image is None:
-            raise ValueError(f"Error: Input or real image is None for files: {image_files}")
-        
-        return input_image, real_image
-    

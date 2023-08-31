@@ -9,6 +9,8 @@
 - Download Visual Studio Code [here](https://code.visualstudio.com/download).
 - Access its Docker extension [here](https://code.visualstudio.com/docs/containers/overview).
 
+**Important Note**: When running the code inside a Docker container, please ensure that you use relative paths for any file or directory references. Absolute paths that work on your local machine might not be recognized correctly within the Docker container environment. Using relative paths will ensure consistent behavior and prevent potential file not found errors.
+
 ### Installation
 #### Ubuntu and Debian-based Linux Distros
 For a detailed installation guide, refer to the official Docker documentation [here](https://docs.docker.com/engine/install/ubuntu/). 
@@ -205,20 +207,27 @@ For a detailed walkthrough, refer to the official NVIDIA guide [here](https://do
     This command creates a Docker container named pix2pix-gpu-container from the pix2pix-gpu-image image and runs it in interactive mode with the host network and all GPUs enabled. It also mounts the current directory to the /app directory in the container.
 
 ##### GPU Monitoring
-- To monitor GPU metrics such as temperature, utilization, and memory usage:
-    ```
-    nvidia-smi
-    ```
-- To monitor GPU metrics in real-time you can download tool such as nvtop
+Monitoring your GPU is important for many machine learning applications:
+- **Thermal Management**: ML tasks can be computationally intensive and lead to increased GPU temperatures. Monitoring helps in preventing overheating, which can disrupt long training sessions. Different GPU models, like the A100 and the 2080, have varying optimal operating temperatures. It's essential to be aware of the recommended temperature range for your specific GPU model. To determine the safe operating temperature for your GPU:
+    1. Google the official specifications of your GPU model. For instance, search for "NVIDIA A100 safe operating temperature" or "RTX 2080 recommended temperature range."
+    2. Refer to the manufacturer's documentation or official website for precise details.
+    3. As a general rule of thumb, it's always better to operate at temperatures below the maximum threshold. 
+- **Resource Management**: Deep learning models, in particular, can consume significant GPU memory. Keeping an eye on memory usage ensures that you're not exceeding available resources, which can lead to training failures or reduced model performance.
+
+To monitor GPU metrics such as temperature, utilization, and memory usage:
+``` 
+nvidia-smi
+```
+To monitor GPU metrics in real-time you can download tool such as nvtop
   
-  To install nvtop:
-    ```
-    sudo apt install nvtop
-    ```
-  To run nvtop:
-    ```
-    nvtop
-    ``` 
+To install nvtop:
+```
+sudo apt install nvtop
+```
+To run nvtop:
+```
+nvtop
+``` 
 
 ---
 
