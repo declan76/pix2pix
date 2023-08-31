@@ -1,38 +1,53 @@
 import os
-import pathlib
-import tensorflow as tf
+import yaml
 import datetime
-from data.data_loader import DataLoader
+import tensorflow as tf
 from data.dataset import Dataset
-from models.generator import Generator
-from models.discriminator import Discriminator
 from training.train import Trainer
-from evaluation.visualise import generate_images
+from models.generator import Generator
+from data.data_loader import DataLoader
+from models.discriminator import Discriminator
+
+
+def load_config(config_path):
+    with open(config_path, "r") as file:
+        config = yaml.safe_load(file)
+    return config
 
 
 def main():
-    BUFFER_SIZE = 400
-    BATCH_SIZE = 1
-    STEPS = 200000
-    TRAIN_RATIO = 0.8
+    config = load_config("config/hyperparameters.yaml")
 
-    csv_path = "data_set/data/single_fits_processor-mf/pairs.csv"
-    dataset_directory = "data_set/data/single_fits_processor-mf/output"
-    train_directory = "data_set/train"
-    test_directory = "data_set/test"
+    # hyperparameters
+    BUFFER_SIZE         = config["hyperparameters"]["BUFFER_SIZE"]
+    BATCH_SIZE          = config["hyperparameters"]["BATCH_SIZE"]
+    STEPS               = config["hyperparameters"]["STEPS"]
+    TRAIN_RATIO         = config["hyperparameters"]["TRAIN_RATIO"]
+
+    # paths
+    dataset_directory   = config["paths"]["dataset_directory"]
+    csv_path            = config["paths"]["csv_path"]
+    train_directory     = config["paths"]["train_directory"]
+    test_directory      = config["paths"]["test_directory"]
+    train_csv_path      = config['paths']['train_csv_path']
+    test_csv_path       = config['paths']['test_csv_path']
+    checkpoint_dir      = config['paths']['checkpoint_dir']
+    log_dir             = config['paths']['log_dir']
 
     data_loader = DataLoader(dataset_directory, csv_path)
 
     # Split the data and get the train and test pairs
     train_pairs, test_pairs = data_loader.split_data(
-        dataset_directory, train_directory, test_directory, csv_path, train_ratio=TRAIN_RATIO
+        dataset_directory,
+        train_directory,
+        test_directory,
+        csv_path,
+        train_ratio=TRAIN_RATIO,
     )
 
     # Save the training and testing pairs to separate CSV files
-    train_csv_path = "data_set/train/pairs.csv"
-    test_csv_path = "data_set/test/pairs.csv"
-    train_pairs.to_csv(train_csv_path, index=False, header=False)  
-    test_pairs.to_csv(test_csv_path, index=False, header=False)   
+    train_pairs.to_csv(train_csv_path, index=False, header=False)
+    test_pairs.to_csv(test_csv_path, index=False, header=False)
 
     # Create train_dataset using the training pairs CSV
     train_data_loader = DataLoader(train_directory, train_csv_path)
@@ -47,11 +62,9 @@ def main():
     discriminator = Discriminator()
     discriminator.build_model()
 
-    log_dir = "./logs/"
     summary_writer = tf.summary.create_file_writer(
         log_dir + "fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     )
-    checkpoint_dir = "./training_checkpoints"
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
     trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
 
