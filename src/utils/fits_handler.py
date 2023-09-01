@@ -14,9 +14,6 @@ def read_fits(file_path, file_path_str=None):
         if data is None:
             raise ValueError(f"Error: No data in FITS file: {file_path_str}")
     
-    # print the fits file data and shape so we can see that it is correct
-    # print(f"Data shape for file {file_path_str}: {data.shape}")
-
     return data
 
 def display_fits_image(file_path_str):

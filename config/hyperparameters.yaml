@@ -11,5 +11,3 @@ paths:
   test_directory: "data_set/test"
   train_csv_path: "data_set/train/pairs.csv"
   test_csv_path: "data_set/test/pairs.csv"
-  checkpoint_dir: "./training_checkpoints"
-  log_dir: "./logs/"

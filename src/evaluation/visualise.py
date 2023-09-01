@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-def generate_images(model, test_input, tar, step, run_timestamp=None):
+def generate_images(model, test_input, tar, step, experiment_dir):
     prediction = model.model(test_input, training=True)
     plt.figure(figsize=(20, 20))
 
@@ -22,12 +22,10 @@ def generate_images(model, test_input, tar, step, run_timestamp=None):
     plt.imshow(error_image, cmap='hot')  # Using a heatmap style for better visualization
     plt.axis('off')
     
-    
-    save_path = os.path.join('./generated_images', run_timestamp)
+    save_path = os.path.join(experiment_dir, 'generated_images')
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     
     plt.savefig(os.path.join(save_path, f'step_{step}.png'))
     plt.close()
 
-    return run_timestamp

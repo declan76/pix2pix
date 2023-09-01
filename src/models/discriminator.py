@@ -14,10 +14,10 @@ class Discriminator:
             tf.keras.layers.Conv2D(
                 filters,
                 size,
-                strides=2,
-                padding="same",
-                kernel_initializer=initializer,
-                use_bias=False,
+                strides            = 2,
+                padding            = "same",
+                kernel_initializer = initializer,
+                use_bias           = False,
             )
         )
 
@@ -38,9 +38,9 @@ class Discriminator:
             [inp, tar]
         )  # (batch_size, 256, 256, channels*2)
 
-        down1 = self.downsample(64, 4, False)(x)  # (batch_size, 128, 128, 64)
-        down2 = self.downsample(128, 4)(down1)  # (batch_size, 64, 64, 128)
-        down3 = self.downsample(256, 4)(down2)  # (batch_size, 32, 32, 256)
+        down1 = self.downsample(64, 4, False)(x)    # (batch_size, 128, 128, 64)
+        down2 = self.downsample(128, 4)(down1)      # (batch_size, 64, 64, 128)
+        down3 = self.downsample(256, 4)(down2)      # (batch_size, 32, 32, 256)
 
         zero_pad1 = tf.keras.layers.ZeroPadding2D()(down3)  # (batch_size, 34, 34, 256)
         conv = tf.keras.layers.Conv2D(

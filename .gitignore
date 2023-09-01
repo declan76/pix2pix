@@ -6,8 +6,6 @@ venv/
 
 data_set/
 
-training_checkpoints/
-
-generated_images/
+experiments/
 
 __pycache__

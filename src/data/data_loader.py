@@ -22,7 +22,7 @@ class DataLoader:
 
     def _load_image(self, image_file_path_tensor):
         image_file_path = image_file_path_tensor.numpy().decode('utf-8')
-        data = read_fits(image_file_path)
+        data            = read_fits(image_file_path)
         if data is None:
             print(f"Data is None for file: {image_file_path}")
         return data
@@ -37,17 +37,17 @@ class DataLoader:
     @staticmethod
     def split_data(dataset_path, train_path, test_path, csv_path, train_ratio=0.8):
         dataset_path_obj = pathlib.Path(dataset_path)
-        train_path_obj = pathlib.Path(train_path)
-        test_path_obj = pathlib.Path(test_path)
+        train_path_obj   = pathlib.Path(train_path)
+        test_path_obj    = pathlib.Path(test_path)
 
         # Read the CSV file into a DataFrame and shuffle the pairs
         pairs = pd.read_csv(csv_path, header=None)  
         pairs = pairs.sample(frac=1).reset_index(drop=True)
 
         # Split the shuffled pairs DataFrame into training and testing datasets
-        train_size = int(train_ratio * len(pairs))
+        train_size  = int(train_ratio * len(pairs))
         train_pairs = pairs.iloc[:train_size]
-        test_pairs = pairs.iloc[train_size:]
+        test_pairs  = pairs.iloc[train_size:]
 
         # Copy the files based on the split pairs to train and test directories
         for _, row in train_pairs.iterrows():

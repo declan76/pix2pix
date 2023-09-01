@@ -16,23 +16,22 @@ def load_config(config_path):
 
 
 def main():
+    # Load the configuration file
     config = load_config("config/hyperparameters.yaml")
 
-    # hyperparameters
-    BUFFER_SIZE         = config["hyperparameters"]["BUFFER_SIZE"]
-    BATCH_SIZE          = config["hyperparameters"]["BATCH_SIZE"]
-    STEPS               = config["hyperparameters"]["STEPS"]
-    TRAIN_RATIO         = config["hyperparameters"]["TRAIN_RATIO"]
+    # Hyperparameters
+    BUFFER_SIZE = config["hyperparameters"]["BUFFER_SIZE"]
+    BATCH_SIZE  = config["hyperparameters"]["BATCH_SIZE"]
+    STEPS       = config["hyperparameters"]["STEPS"]
+    TRAIN_RATIO = config["hyperparameters"]["TRAIN_RATIO"]
 
-    # paths
-    dataset_directory   = config["paths"]["dataset_directory"]
-    csv_path            = config["paths"]["csv_path"]
-    train_directory     = config["paths"]["train_directory"]
-    test_directory      = config["paths"]["test_directory"]
-    train_csv_path      = config['paths']['train_csv_path']
-    test_csv_path       = config['paths']['test_csv_path']
-    checkpoint_dir      = config['paths']['checkpoint_dir']
-    log_dir             = config['paths']['log_dir']
+    # Paths
+    dataset_directory = config["paths"]["dataset_directory"]
+    csv_path          = config["paths"]["csv_path"]
+    train_directory   = config["paths"]["train_directory"]
+    test_directory    = config["paths"]["test_directory"]
+    train_csv_path    = config['paths']['train_csv_path']
+    test_csv_path     = config['paths']['test_csv_path']
 
     data_loader = DataLoader(dataset_directory, csv_path)
 
@@ -51,24 +50,38 @@ def main():
 
     # Create train_dataset using the training pairs CSV
     train_data_loader = DataLoader(train_directory, train_csv_path)
-    train_dataset = Dataset(train_data_loader, BUFFER_SIZE, BATCH_SIZE).create_dataset()
+    train_dataset     = Dataset(train_data_loader, BUFFER_SIZE, BATCH_SIZE).create_dataset()
 
     # Create test_dataset using the testing pairs CSV
     test_data_loader = DataLoader(test_directory, test_csv_path)
-    test_dataset = Dataset(test_data_loader, BUFFER_SIZE, BATCH_SIZE).create_dataset()
+    test_dataset     = Dataset(test_data_loader, BUFFER_SIZE, BATCH_SIZE).create_dataset()
 
-    generator = Generator()
-    generator.build_model()
+    # Create the generator and discriminator models
+    generator     = Generator()
     discriminator = Discriminator()
+    generator.build_model()
     discriminator.build_model()
 
-    summary_writer = tf.summary.create_file_writer(
-        log_dir + "fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    )
-    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-    trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
+    # Create a unique directory for this experiment based on the current date-time
+    experiment_timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    experiment_dir       = os.path.join('./experiments', experiment_timestamp)
+    os.makedirs(experiment_dir, exist_ok=True)
 
-    trainer.fit(train_dataset, test_dataset, steps=STEPS)
+    # Copy the current configuration to the experiment directory
+    with open(os.path.join(experiment_dir, 'hyperparameters.yaml'), 'w') as file:
+        yaml.dump(config, file)
+
+    # Update paths for logs, checkpoints, and generated images
+    log_dir        = os.path.join(experiment_dir, 'logs', 'fit')
+    checkpoint_dir = os.path.join(experiment_dir, 'training_checkpoints')
+
+    # Create the summary writer and checkpoint manager
+    summary_writer    = tf.summary.create_file_writer(log_dir)
+    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+    trainer           = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
+
+    # Train the model
+    trainer.fit(train_dataset, test_dataset, steps=STEPS, experiment_dir=experiment_dir)
 
 
 if __name__ == "__main__":
