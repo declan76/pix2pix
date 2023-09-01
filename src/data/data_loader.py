@@ -12,7 +12,6 @@ class DataLoader:
         # Shuffle the rows of the DataFrame
         self.pairs = self.pairs.sample(frac=1).reset_index(drop=True)
 
-
     def load(self, image_file):
         if not image_file.endswith('.fits'):
             image_file += '.fits'
@@ -33,12 +32,31 @@ class DataLoader:
         input_image = self.load(input_image_name)
         real_image = self.load(real_image_name)
         return input_image, real_image
+ 
 
     @staticmethod
     def split_data(dataset_path, train_path, test_path, csv_path, train_ratio=0.8):
         dataset_path_obj = pathlib.Path(dataset_path)
         train_path_obj   = pathlib.Path(train_path)
         test_path_obj    = pathlib.Path(test_path)
+
+        # Function to clear the contents of a directory
+        def clear_directory(directory):
+            for item in directory.iterdir():
+                if item.is_dir():
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
+
+        # Ensure train and test directories exist
+        train_path_obj.mkdir(parents=True, exist_ok=True)
+        test_path_obj.mkdir(parents=True, exist_ok=True)
+
+        # Clear the contents of train and test directories if they exist and have data
+        if any(train_path_obj.iterdir()):
+            clear_directory(train_path_obj)
+        if any(test_path_obj.iterdir()):
+            clear_directory(test_path_obj)
 
         # Read the CSV file into a DataFrame and shuffle the pairs
         pairs = pd.read_csv(csv_path, header=None)  
@@ -59,4 +77,5 @@ class DataLoader:
             shutil.copy(dataset_path_obj / row.iloc[1], test_path_obj / row.iloc[1])    # Use iloc
 
         return train_pairs, test_pairs
+
 
