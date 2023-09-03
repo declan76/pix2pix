@@ -1,5 +1,4 @@
 import tensorflow as tf
-from .generator import Generator
 
 
 class Discriminator:

@@ -1,13 +1,5 @@
 hyperparameters:
   BUFFER_SIZE: 400
   BATCH_SIZE: 1
-  STEPS: 200000
+  STEPS: 1000 # 200000
   TRAIN_RATIO: 0.8 # data set split - 80% train and 20% test 
-
-paths:
-  dataset_directory: "data_set/data/single_fits_processor-mf/output"
-  csv_path: "data_set/data/single_fits_processor-mf/pairs.csv"
-  train_directory: "data_set/train"
-  test_directory: "data_set/test"
-  train_csv_path: "data_set/train/pairs.csv"
-  test_csv_path: "data_set/test/pairs.csv"

@@ -6,7 +6,8 @@ from utils.fits_handler import read_fits
 
 class DataLoader:
     def __init__(self, dataset_directory, csv_path):
-        self.dataset_directory = pathlib.Path(dataset_directory)
+        # Get the parent directory of the CSV file
+        self.dataset_directory = pathlib.Path(dataset_directory).parent  
         # Read the CSV file into a DataFrame
         self.pairs = pd.read_csv(csv_path)
         # Shuffle the rows of the DataFrame
