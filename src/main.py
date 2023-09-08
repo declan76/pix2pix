@@ -11,6 +11,7 @@ from data.data_loader import DataLoader
 from pix2pix.generator import Generator
 from pix2pix.discriminator import Discriminator
 
+
 def query_yes_no(prompt):
     while True:
         response = input(prompt + " (yes/no): ").strip().lower()
@@ -21,9 +22,15 @@ def query_yes_no(prompt):
         else:
             print("Invalid input. Please enter yes/no, y/n, 1/0.")
 
+
+
 class ModelManager:
+    EXPERIMENTS_DIR      = "./experiments"
+    HYPERPARAMETERS_PATH = "config/hyperparameters.yaml"
+
     def __init__(self, base_dir="data_set/data"):
         self.base_dir = base_dir
+        self.config   = self.load_config(self.HYPERPARAMETERS_PATH)
 
     def load_config(self, config_path):
         with open(config_path, "r") as file:
@@ -41,11 +48,10 @@ class ModelManager:
         return checkpoints
 
     def prompt_for_checkpoint(self, available_checkpoints):
-        if query_yes_no("Would you like to resume training from a previous checkpoint?"):
-            print("Available checkpoints:")
-            for idx, (experiment, checkpoint) in enumerate(available_checkpoints, 1):
-                print(f"{idx}. {experiment}: {checkpoint}")
-            return available_checkpoints[int(input("Enter the number of the checkpoint you want to resume from: ")) - 1]
+        print("Available checkpoints:")
+        for idx, (experiment, checkpoint) in enumerate(available_checkpoints, 1):
+            print(f"{idx}. {experiment}: {checkpoint}")
+        return available_checkpoints[int(input("Enter the number of the checkpoint you want to resume from: ")) - 1]
 
     def check_for_data(self, experiment_dir):
         base_dir = os.path.join("./experiments", experiment_dir, "data")
@@ -57,14 +63,10 @@ class ModelManager:
         return False
 
 
+
 class TrainingManager(ModelManager):
-
-    EXPERIMENTS_DIR      = "./experiments"
-    HYPERPARAMETERS_PATH = "config/hyperparameters.yaml"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.config = self.load_config(self.HYPERPARAMETERS_PATH)
 
     @property
     def current_experiment_timestamp(self):
@@ -179,7 +181,10 @@ class TrainingManager(ModelManager):
     def orchestrate_training(self):
         try:
             available_checkpoints = self.get_available_checkpoints()
-            checkpoint_result     = self.prompt_for_checkpoint(available_checkpoints) if available_checkpoints else None
+            if available_checkpoints and query_yes_no("Would you like to resume training from a previous checkpoint?"):
+                checkpoint_result = self.prompt_for_checkpoint(available_checkpoints)
+            else:
+                checkpoint_result = None
             experiment_dir        = self.create_experiment_directory()
 
             using_checkpoint_data, selected_experiment, selected_checkpoint_file = self.handle_checkpoint_data(checkpoint_result, experiment_dir)
@@ -203,22 +208,108 @@ class TrainingManager(ModelManager):
             traceback.print_exc()
 
 
+
 class EvaluatorManager(ModelManager):
-    # to be done later.
-    pass
+    def __init__(self, trainer: Trainer, *args, **kwargs):  
+        super().__init__(*args, **kwargs)
+        self.trainer = trainer 
+
+    def evaluate_model(self, test_csv_path, checkpoint_result):
+        test_data_loader = DataLoader(test_csv_path, test_csv_path)
+        test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+
+        generator     = Generator()
+        discriminator = Discriminator()
+        generator.build_model()
+        discriminator.build_model()
+
+        selected_experiment, selected_checkpoint_file = checkpoint_result
+        checkpoint_path = os.path.join(
+            "./experiments",
+            selected_experiment,
+            "training_checkpoints",
+            selected_checkpoint_file.replace('.index', '')
+        )
+        checkpoint = tf.train.Checkpoint(
+            generator_optimizer     = self.trainer.generator_optimizer,
+            discriminator_optimizer = self.trainer.discriminator_optimizer,
+            generator               = self.trainer.generator.model,
+            discriminator           = self.trainer.discriminator.model
+        )
+        
+        status = checkpoint.restore(checkpoint_path)
+        status.expect_partial()
+
+        mse_losses = []
+        for idx, (file_name, input_image, target) in enumerate(test_dataset):
+            prediction = generator.model(input_image, training=False)
+            mse_loss   = tf.keras.losses.MeanSquaredError()(target, prediction)
+            mse_losses.append(mse_loss.numpy())
+            print(f"MSE for test file {file_name.numpy()[0].decode('utf-8')}: {mse_loss.numpy()}")
+
+        avg_mse = sum(mse_losses) / len(mse_losses)
+        print(f"Average MSE on test data: {avg_mse}")
+
+
+    def orchestrate_evaluation(self):
+        try:
+            available_checkpoints = self.get_available_checkpoints()
+            if available_checkpoints:
+                print("Please select the checkpoint you want to evaluate from: ")
+                checkpoint_result = self.prompt_for_checkpoint(available_checkpoints)
+            else: 
+                print("No checkpoints found. Please train a model first.")
+                return
+
+            using_existing_data = False
+            if checkpoint_result:
+                selected_experiment, _ = checkpoint_result
+                using_existing_data = self.check_for_data(selected_experiment)
+
+            if using_existing_data:
+                test_csv_path = os.path.join("./experiments", selected_experiment, "data", "test", "pairs.csv")
+            else:
+                test_csv_path = os.path.join(self.base_dir, "test", "pairs.csv")
+                if not os.path.exists(test_csv_path):
+                    print("No test data found in the default directory.")
+                    test_csv_path = input("Please enter the path to the test data directory: ")
+
+            self.evaluate_model(test_csv_path, checkpoint_result)
+        except Exception as e:
+            print("-" * 50)
+            print(f"An error occurred: {e}")
+            print("Traceback:")
+            traceback.print_exc()
+
 
 
 def main():
-    action = (input("Do you want to train or evaluate? (train/evaluate): ").strip().lower())
-    if action == "train":
+    action = input("Do you want to train or evaluate? (t/e): ").strip().lower()
+
+    while action not in ["t", "e"]:
+        print("Invalid input. Please enter t or e.")
+        action = input("Do you want to train or evaluate? (t/e): ").strip().lower()
+
+    if action == "t":
         training_manager = TrainingManager()
         training_manager.orchestrate_training()
-    elif action == "evaluate":
-        # evaluator = Evaluator()
-        # evaluator.evaluate()
-        print("Evaluation logic not implemented yet.")
-    else:
-        print("Invalid choice!")
+    elif action == "e":
+        generator     = Generator()
+        discriminator = Discriminator()
+        generator.build_model()
+        discriminator.build_model()
+        
+        experiment_dir    = os.path.join(ModelManager.EXPERIMENTS_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        log_dir           = os.path.join(experiment_dir, "logs", "fit")
+        checkpoint_dir    = os.path.join(experiment_dir, "training_checkpoints")
+        summary_writer    = tf.summary.create_file_writer(log_dir)
+        checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+        
+        trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
+
+        evaluator_manager = EvaluatorManager(trainer)
+        evaluator_manager.orchestrate_evaluation()
+
 
 
 if __name__ == "__main__":

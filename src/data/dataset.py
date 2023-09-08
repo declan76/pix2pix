@@ -11,7 +11,8 @@ class Dataset:
     def create_dataset(self):
         num_pairs = len(self.data_loader.pairs)
         dataset   = tf.data.Dataset.range(num_pairs)
-        dataset   = dataset.map(lambda idx: tf.py_function(self.data_loader.load_image_pair, [idx], [tf.float32, tf.float32]))
+        dataset   = dataset.map(lambda idx: tf.py_function(self.data_loader.load_image_pair, [idx], [tf.string, tf.float32, tf.float32]))
         dataset   = dataset.batch(self.batch_size)
         return dataset
+
     

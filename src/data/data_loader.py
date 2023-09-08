@@ -28,12 +28,12 @@ class DataLoader:
         return data
 
     def load_image_pair(self, index_tensor):
-        index = index_tensor.numpy()  # Convert tensor to numpy array
+        index = index_tensor.numpy()         # Convert tensor to numpy array
         input_image_name, real_image_name = self.pairs.iloc[int(index)]  # Convert numpy array to integer
         input_image = self.load(input_image_name)
-        real_image = self.load(real_image_name)
-        return input_image, real_image
- 
+        real_image  = self.load(real_image_name)
+        return input_image_name, input_image, real_image
+
 
     @staticmethod
     def split_data(dataset_path, train_path, test_path, csv_path, train_ratio=0.8):

@@ -1,3 +1,4 @@
+import os
 import time
 import tensorflow as tf
 from IPython import display
@@ -14,15 +15,18 @@ class Trainer:
         self.discriminator           = discriminator
         self.summary_writer          = summary_writer
         self.checkpoint_prefix       = checkpoint_prefix
-        self.checkpoint              = tf.train.Checkpoint(generator_optimizer=self.generator_optimizer,
-                                              discriminator_optimizer=self.discriminator_optimizer,
-                                              generator=self.generator.model,
-                                              discriminator=self.discriminator.model)
+        self.checkpoint              = tf.train.Checkpoint(
+            generator_optimizer     = self.generator_optimizer,
+            discriminator_optimizer = self.discriminator_optimizer,
+            generator               = self.generator.model,
+            discriminator           = self.discriminator.model)
+            
         # Initialize loss attributes
         self.gen_total_loss = None
         self.gen_gan_loss   = None
         self.gen_l1_loss    = None
         self.disc_loss      = None
+        self.mse_loss       = None
 
 
     @tf.function
@@ -53,11 +57,11 @@ class Trainer:
 
 
     def fit(self, train_ds, test_ds, steps, experiment_dir):
-        example_input, example_target = next(iter(test_ds.take(1)))
+        _, example_input, example_target = next(iter(test_ds.take(1)))
         start = time.time()
 
         try:
-            for step, (input_image, target) in train_ds.repeat().take(steps).enumerate():
+            for step, (_, input_image, target) in train_ds.repeat().take(steps).enumerate():
                 gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss, mse_loss = self.train_step(input_image, target, step)
                 if (step) % 1000 == 0:
                     display.clear_output(wait=True)
@@ -92,8 +96,8 @@ class Trainer:
                 if (step+1) % 10 == 0:
                     print('.', end='', flush=True)
 
-                # Save (checkpoint) the model every 5k steps
-                if (step + 1) % 5000 == 0:
+                # Save the model every 5k steps
+                if (step + 1) % 5000 == 0 or (step + 1) == steps:
                     self.checkpoint.save(file_prefix=self.checkpoint_prefix)
 
         except KeyboardInterrupt:
