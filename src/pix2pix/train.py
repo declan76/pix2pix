@@ -5,7 +5,7 @@ from IPython import display
 from prettytable import PrettyTable
 from pix2pix.generator import Generator
 from pix2pix.discriminator import Discriminator
-from evaluation.visualise import generate_images
+from utils.visualise import generate_images
 
 class Trainer:
     def __init__(self, generator: Generator, discriminator: Discriminator, summary_writer, checkpoint_prefix):
