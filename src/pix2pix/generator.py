@@ -104,6 +104,5 @@ class Generator:
         gan_loss       = Generator.loss_object(tf.ones_like(disc_generated_output), disc_generated_output)
         l1_loss        = tf.reduce_mean(tf.abs(target - gen_output))
         total_gen_loss = gan_loss + (Generator.LAMBDA * l1_loss)
-        mse_loss       = tf.reduce_mean(tf.square(gen_output - target))
-        return total_gen_loss, gan_loss, l1_loss, mse_loss
+        return total_gen_loss, gan_loss, l1_loss
 

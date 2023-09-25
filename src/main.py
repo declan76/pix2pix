@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import yaml
 import shutil
@@ -33,6 +34,7 @@ class UserInputManager:
         return action
 
 
+
 class FileManager:
     EXPERIMENTS_DIR = "./experiments"
 
@@ -63,10 +65,6 @@ class FileManager:
         return os.path.exists(directory) and any(file.endswith(".csv") for file in os.listdir(directory))
 
     @staticmethod
-    def is_data_already_split(directory):
-        return all(os.path.exists(os.path.join(directory, d)) for d in ["train", "test"])
-
-    @staticmethod
     def copy_data_to_experiment_folder(source_dir, dest_dir):
         if os.path.exists(dest_dir):
             shutil.rmtree(dest_dir)
@@ -81,12 +79,11 @@ class FileManager:
 
 
 class ModelManager:
-    EXPERIMENTS_DIR      = "./experiments"
+    EXPERIMENTS_DIR = "./experiments"
     HYPERPARAMETERS_PATH = "config/hyperparameters.yaml"
 
-    def __init__(self, base_dir="data_set/data"):
-        self.base_dir = base_dir
-        self.config   = self.load_config(self.HYPERPARAMETERS_PATH)
+    def __init__(self):
+        self.config = self.load_config(self.HYPERPARAMETERS_PATH)
 
     def load_config(self, config_path):
         with open(config_path, "r") as file:
@@ -103,20 +100,41 @@ class ModelManager:
                         checkpoints.append((experiment, f))
         return checkpoints
 
-    def prompt_for_checkpoint(self, available_checkpoints):
-        print("Available checkpoints:")
-        for idx, (experiment, checkpoint) in enumerate(available_checkpoints, 1):
-            print(f"{idx}. {experiment}: {checkpoint}")
-        return available_checkpoints[int(input("Enter the number of the checkpoint you want to resume from: ")) - 1]
-
-    def check_for_data(self, experiment_dir):
-        base_dir = os.path.join("./experiments", experiment_dir, "data")
-        has_data = lambda directory: os.path.exists(directory) and os.listdir(directory)
-        if all(map(has_data, [os.path.join(base_dir, d) for d in ["train", "test"]])):
-            print(f"Data found in {experiment_dir} folder.")
-            return UserInputManager.query_yes_no("Do you want to use this data?")
-        print("No data found in the experiment directory.")
-        return False
+    def prompt_for_checkpoint(self):
+        choice = UserInputManager.query_yes_no("Would you like the system to automatically search the experiments directory for all available checkpoints?")
+        if choice:
+            available_checkpoints = self.get_available_checkpoints()
+            if not available_checkpoints:
+                print("No checkpoints found.")
+                return None
+            print("Available checkpoints:")
+            for idx, (experiment, checkpoint) in enumerate(available_checkpoints, 1):
+                print(f"[{idx}] {experiment}/training_checkpoints/{checkpoint}")
+            selection = int(input("Please select a checkpoint by entering the number beside it: "))
+            if 1 <= selection <= len(available_checkpoints):
+                experiment, checkpoint = available_checkpoints[selection - 1]
+                print(f"You've selected checkpoint {checkpoint} from {experiment}/training_checkpoints. Proceeding with this checkpoint..")
+                checkpoint_path = os.path.join(
+                    FileManager.EXPERIMENTS_DIR,
+                    experiment,
+                    "training_checkpoints",
+                    checkpoint.replace('.index', '')
+                )
+                return checkpoint_path
+            else:
+                print("Invalid selection.")
+                sys.exit() 
+        else:
+            checkpoint_path = input("Please enter the full path to the checkpoint directory (./path/to/checkpoint/ckpt-n): ")
+            print(f"You've selected checkpoint {os.path.basename(checkpoint_path)}. Proceeding with this checkpoint...")
+            return checkpoint_path
+    
+    def get_data_directory(self, data_type):
+        data_dir = input(f"Please enter the path to the {data_type} data directory: ")
+        if FileManager.check_data_exists(data_dir):
+            return data_dir
+        else:
+            raise ValueError(f"No CSV file found in the provided {data_type} directory.")
     
     @staticmethod
     def create_and_build_models():
@@ -142,98 +160,33 @@ class TrainingManager(ModelManager):
         os.makedirs(experiment_dir, exist_ok=True)
         return experiment_dir
 
-    def handle_checkpoint_data(self, checkpoint_result, experiment_dir):
-        if not checkpoint_result:
-            return False, None, None
-
-        selected_experiment, selected_checkpoint_file = checkpoint_result
-        selected_data_directory = os.path.join("./experiments", selected_experiment, "data")
-        if self.is_data_already_split(selected_data_directory):
-            if UserInputManager.query_yes_no(f"Data found in {selected_experiment} directory. Would you like to use it?"):
-                self.copy_data_to_experiment_folder(selected_data_directory, os.path.join(experiment_dir, "data"))
-                return True, selected_experiment, selected_checkpoint_file
-
-        return False, selected_experiment, selected_checkpoint_file
-
-    def handle_data_split(self, using_checkpoint_data, experiment_dir):
-        if using_checkpoint_data:
-            return [os.path.join(experiment_dir, "data", d, "pairs.csv") for d in ["train", "test"]]
-
-        dataset_directory       = self.get_data_directory()
-        csv_path                = os.path.join(dataset_directory, "pairs.csv")
-        data_loader             = DataLoader(dataset_directory, csv_path)
-        train_pairs, test_pairs = data_loader.split_data(
-            dataset_directory,
-            os.path.join(experiment_dir, "data", "train"),
-            os.path.join(experiment_dir, "data", "test"),
-            csv_path,
-            train_ratio=self.config["hyperparameters"]["TRAIN_RATIO"]
-        )
-        paths = [os.path.join(experiment_dir, "data", d, "pairs.csv") for d in ["train", "test"]]
-        for data, path in zip([train_pairs, test_pairs], paths):
-            data.to_csv(path, index=False, header=False)
-
-        return paths
-    
-    def get_data_directory(self):
-        if self.check_data_exists(self.base_dir):
-            if UserInputManager.query_yes_no(f"Would you like to use the default path ({self.base_dir}) for the data set directory? "):
-                return self.base_dir
-        return input("Please enter the path to the data set directory: ")
-    
-    @staticmethod
-    def check_data_exists(directory):
-        return os.path.exists(directory) and any(file.endswith(".csv") for file in os.listdir(directory))
-
-    @staticmethod
-    def is_data_already_split(directory):
-        return all(os.path.exists(os.path.join(directory, d)) for d in ["train", "test"])
-
-    @staticmethod
-    def copy_data_to_experiment_folder(source_dir, dest_dir):
-        if os.path.exists(dest_dir):
-            shutil.rmtree(dest_dir)
-        shutil.copytree(source_dir, dest_dir)
-
-    @staticmethod
-    def create_training_info_file(experiment_dir, **kwargs):
-        with open(os.path.join(experiment_dir, "training_info.txt"), "w") as file:
-            for key, value in kwargs.items():
-                file.write(f"{key.replace('_', ' ').title()}: {value}\n")
-     
-    def train_model(self, train_csv_path, test_csv_path, experiment_dir, checkpoint_result):
+    def train_model(self, train_csv_path, test_csv_path, experiment_dir, checkpoint_path=None):
         train_data_loader = DataLoader(train_csv_path, train_csv_path)
-        train_dataset     = Dataset(train_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
-        test_data_loader  = DataLoader(test_csv_path, test_csv_path)
-        test_dataset      = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+        train_dataset = Dataset(train_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+
+        test_data_loader = DataLoader(test_csv_path, test_csv_path)
+        test_dataset = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
 
         with open(os.path.join(experiment_dir, "hyperparameters.yaml"), "w") as file:
             yaml.dump(self.config, file)
 
-        log_dir        = os.path.join(experiment_dir, "logs", "fit")
+        log_dir = os.path.join(experiment_dir, "logs", "fit")
         checkpoint_dir = os.path.join(experiment_dir, "training_checkpoints")
 
-        summary_writer    = tf.summary.create_file_writer(log_dir)
+        summary_writer = tf.summary.create_file_writer(log_dir)
         checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-        trainer           = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
+        trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
 
-        if checkpoint_result:
-            selected_experiment, selected_checkpoint_file = checkpoint_result
-            checkpoint_path = os.path.join(
-                "./experiments",
-                selected_experiment,
-                "training_checkpoints",
-                selected_checkpoint_file.replace('.index', '')
-            )
+        if checkpoint_path:
             trainer.checkpoint.restore(checkpoint_path)
 
         start_time = time.time()
-        trainer.fit(train_dataset, test_dataset, steps=self.config["hyperparameters"]["STEPS"], experiment_dir=experiment_dir)
+        trainer.fit(train_dataset, test_dataset, steps=self.config["hyperparameters"]["STEPS"], experiment_dir=experiment_dir)        
         end_time = time.time()
 
-        total_time       = end_time - start_time
+        total_time = end_time - start_time
         hours, remainder = divmod(total_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         print(f"\nTraining completed in {int(hours)}h {int(minutes)}m {int(seconds)}s")
@@ -242,32 +195,33 @@ class TrainingManager(ModelManager):
 
     def orchestrate_training(self):
         try:
-            available_checkpoints = self.get_available_checkpoints()
-            if available_checkpoints and UserInputManager.query_yes_no("Would you like to resume training from a previous checkpoint?"):
-                checkpoint_result = self.prompt_for_checkpoint(available_checkpoints)
-            else:
-                checkpoint_result = None
-            experiment_dir        = self.create_experiment_directory()
+            experiment_dir = self.create_experiment_directory()
+            
+            # Ask for training data directory
+            training_data_dir = self.get_data_directory("training")
+            FileManager.copy_data_to_experiment_folder(training_data_dir, os.path.join(experiment_dir, "data", "train"))
+            train_csv_path = os.path.join(experiment_dir, "data", "train", "pairs.csv")
+            
+            # Ask for test data directory
+            test_data_dir = self.get_data_directory("test")
+            FileManager.copy_data_to_experiment_folder(test_data_dir, os.path.join(experiment_dir, "data", "test"))
+            test_csv_path = os.path.join(experiment_dir, "data", "test", "pairs.csv")
 
-            using_checkpoint_data, selected_experiment, selected_checkpoint_file = self.handle_checkpoint_data(checkpoint_result, experiment_dir)
-            train_csv_path, test_csv_path = self.handle_data_split(using_checkpoint_data, experiment_dir)
+            # Initialize checkpoint_path to None
+            checkpoint_path = None
 
+            # Prompt for checkpoint
+            if UserInputManager.query_yes_no("Would you like to use a checkpoint from a previous run?"):
+                checkpoint_path = self.prompt_for_checkpoint()
+                
+            self.train_model(train_csv_path, test_csv_path, experiment_dir, checkpoint_path)
 
-            self.create_training_info_file(
-                experiment_dir,
-                is_continuation     = bool(checkpoint_result),
-                previous_experiment = selected_experiment,
-                checkpoint_file     = selected_checkpoint_file,
-                use_existing_data   = using_checkpoint_data,
-                existing_data_dir   = os.path.join(self.EXPERIMENTS_DIR, selected_experiment, "data") if using_checkpoint_data else None
-            )
-
-            self.train_model(train_csv_path, test_csv_path, experiment_dir, checkpoint_result)
         except Exception as e:
-            print("-" * 50)
-            print(f"An error occurred: {e}")
-            print("Traceback:")
+            print(f"An error occurred: {str(e)}")
             traceback.print_exc()
+
+
+
 
 
 
@@ -276,19 +230,12 @@ class EvaluatorManager(ModelManager):
         super().__init__(*args, **kwargs)
         self.trainer = trainer 
 
-    def evaluate_model(self, test_csv_path, checkpoint_result):
+    def evaluate_model(self, test_csv_path, checkpoint_path):
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
         test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
-
-        selected_experiment, selected_checkpoint_file = checkpoint_result
-        checkpoint_path = os.path.join(
-            FileManager.EXPERIMENTS_DIR,
-            selected_experiment,
-            "training_checkpoints",
-            selected_checkpoint_file.replace('.index', '')
-        )
+        
         checkpoint = tf.train.Checkpoint(
             generator_optimizer     = self.trainer.generator_optimizer,
             discriminator_optimizer = self.trainer.discriminator_optimizer,
@@ -311,33 +258,25 @@ class EvaluatorManager(ModelManager):
 
     def orchestrate_evaluation(self):
         try:
-            available_checkpoints = FileManager.get_available_checkpoints()
-            if available_checkpoints:
-                print("Please select the checkpoint you want to evaluate from: ")
-                checkpoint_result = self.prompt_for_checkpoint(available_checkpoints)
-            else: 
-                print("No checkpoints found. Please train a model first.")
-                return
+            # Initialize checkpoint_path to None
+            checkpoint_path = None
 
-            using_existing_data = False
-            if checkpoint_result:
-                selected_experiment, _ = checkpoint_result
-                using_existing_data = self.check_for_data(selected_experiment)
+            # Prompt for checkpoint
+            checkpoint_path = self.prompt_for_checkpoint()
+        
+            test_path     = self.get_data_directory("test")
+            test_csv_path = os.path.join(test_path, "pairs.csv")
+            if not os.path.exists(test_csv_path):
+                raise ValueError(f"No CSV file found in the provided test directory.")
 
-            if using_existing_data:
-                test_csv_path = os.path.join(FileManager.EXPERIMENTS_DIR, selected_experiment, "data", "test", "pairs.csv")
-            else:
-                test_csv_path = os.path.join(self.base_dir, "test", "pairs.csv")
-                if not FileManager.check_data_exists(test_csv_path):
-                    print("No test data found in the default directory.")
-                    test_csv_path = input("Please enter the path to the test data directory: ")
 
-            self.evaluate_model(test_csv_path, checkpoint_result)
+            self.evaluate_model(test_csv_path, checkpoint_path)
         except Exception as e:
             print("-" * 50)
             print(f"An error occurred: {e}")
             print("Traceback:")
             traceback.print_exc()
+
 
 
 

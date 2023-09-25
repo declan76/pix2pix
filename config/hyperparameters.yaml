@@ -1,5 +1,5 @@
 hyperparameters:
   BUFFER_SIZE: 400
   BATCH_SIZE: 1
-  STEPS: 1000 # 200000
+  STEPS: 25000 # 200000
   TRAIN_RATIO: 0.8 # data set split - 80% train and 20% test 
