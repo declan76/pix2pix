@@ -6,8 +6,9 @@ def generate_images(model, test_input, tar, step, experiment_dir):
     prediction = model.model(test_input, training=True)
     plt.figure(figsize=(20, 20))
 
-    display_list = [test_input[0], tar[0], prediction[0]]
-    title = ['Input Image', 'Ground Truth', 'Predicted Image']
+    # Swap the positions of Ground Truth and Predicted Image
+    display_list = [test_input[0], prediction[0], tar[0]]
+    title = ['Input Image (T1)', 'Predicted Image (T2)', 'Ground Truth (T2)']
 
     for i in range(3):
         plt.subplot(2, 2, i+1)
@@ -28,4 +29,3 @@ def generate_images(model, test_input, tar, step, experiment_dir):
     
     plt.savefig(os.path.join(save_path, f'step_{step}.png'))
     plt.close()
-
