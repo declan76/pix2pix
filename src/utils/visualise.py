@@ -6,7 +6,6 @@ def generate_images(model, test_input, tar, step, experiment_dir):
     prediction = model.model(test_input, training=True)
     plt.figure(figsize=(20, 20))
 
-    # Swap the positions of Ground Truth and Predicted Image
     display_list = [test_input[0], prediction[0], tar[0]]
     title = ['Input Image (T1)', 'Predicted Image (T2)', 'Ground Truth (T2)']
 

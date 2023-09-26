@@ -55,12 +55,6 @@ class FileManager:
         return checkpoints
 
     @staticmethod
-    def create_experiment_directory(timestamp):
-        experiment_dir = os.path.join(FileManager.EXPERIMENTS_DIR, timestamp)
-        os.makedirs(experiment_dir, exist_ok=True)
-        return experiment_dir
-
-    @staticmethod
     def check_data_exists(directory):
         return os.path.exists(directory) and any(file.endswith(".csv") for file in os.listdir(directory))
 
@@ -225,58 +219,88 @@ class TrainingManager(ModelManager):
 
 
 
-class EvaluatorManager(ModelManager):
-    def __init__(self, trainer: Trainer, *args, **kwargs):  
+class EvaluationManager(ModelManager):
+    def __init__(self, trainer: Trainer, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.trainer = trainer 
+        self.trainer = trainer
 
-    def evaluate_model(self, test_csv_path, checkpoint_path):
+    def get_default_evaluation_path(self, checkpoint_path):
+        base_dir = os.path.dirname(os.path.dirname(checkpoint_path))
+        return os.path.join(base_dir, "evaluation")
+
+    def get_final_save_path(self, checkpoint_path):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        checkpoint_name = os.path.basename(checkpoint_path)
+        folder_name = f"{timestamp}_{checkpoint_name}"
+        return os.path.join(self.get_default_evaluation_path(checkpoint_path), folder_name)
+
+    def save_evaluation_results(self, final_save_path, mse_values):
+        os.makedirs(final_save_path, exist_ok=True)
+
+        mse_file_path = os.path.join(final_save_path, "MSE.CSV")
+        with open(mse_file_path, "w") as file:
+            for filename, mse in mse_values.items():
+                file.write(f"{filename},{mse}\n")
+
+        print(f"Evaluation results saved to {mse_file_path}")
+
+    def evaluate_model(self, test_csv_path, checkpoint_path, save_images_path):
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
-        test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+        test_dataset = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
-        
+
         checkpoint = tf.train.Checkpoint(
-            generator_optimizer     = self.trainer.generator_optimizer,
-            discriminator_optimizer = self.trainer.discriminator_optimizer,
-            generator               = self.trainer.generator.model,
-            discriminator           = self.trainer.discriminator.model
+            generator_optimizer=self.trainer.generator_optimizer,
+            discriminator_optimizer=self.trainer.discriminator_optimizer,
+            generator=self.trainer.generator.model,
+            discriminator=self.trainer.discriminator.model
         )
-        
+
         status = checkpoint.restore(checkpoint_path)
         status.expect_partial()
 
-        mse_losses = []
+        mse_values = {}
         for idx, (file_name, input_image, target) in enumerate(test_dataset):
             prediction = generator.model(input_image, training=False)
-            mse_loss   = tf.keras.losses.MeanSquaredError()(target, prediction)
-            mse_losses.append(mse_loss.numpy())
+            mse_loss = tf.keras.losses.MeanSquaredError()(target, prediction)
+            mse_values[file_name.numpy()[0].decode('utf-8')] = mse_loss.numpy()
             print(f"MSE for test file {file_name.numpy()[0].decode('utf-8')}: {mse_loss.numpy()}")
 
-        avg_mse = sum(mse_losses) / len(mse_losses)
+            # Save generated images if path is provided
+            if save_images_path:
+                image_name = f"{file_name.numpy()[0].decode('utf-8')}_predicted.png"
+                image_path = os.path.join(save_images_path, image_name)
+                tf.keras.preprocessing.image.save_img(image_path, prediction[0])
+
+        avg_mse = sum(mse_values.values()) / len(mse_values)
         print(f"Average MSE on test data: {avg_mse}")
+        return mse_values
 
     def orchestrate_evaluation(self):
         try:
-            # Initialize checkpoint_path to None
-            checkpoint_path = None
-
-            # Prompt for checkpoint
             checkpoint_path = self.prompt_for_checkpoint()
-        
-            test_path     = self.get_data_directory("test")
+            test_path = self.get_data_directory("test")
             test_csv_path = os.path.join(test_path, "pairs.csv")
             if not os.path.exists(test_csv_path):
                 raise ValueError(f"No CSV file found in the provided test directory.")
 
+            final_save_path = self.get_final_save_path(checkpoint_path)
 
-            self.evaluate_model(test_csv_path, checkpoint_path)
+            save_images = UserInputManager.query_yes_no("Do you want to save the generated images?")
+            if save_images:
+                save_images_path = os.path.join(final_save_path, "generated_images")
+                os.makedirs(save_images_path, exist_ok=True)
+            else:
+                save_images_path = None
+
+            mse_values = self.evaluate_model(test_csv_path, checkpoint_path, save_images_path)
+            self.save_evaluation_results(final_save_path, mse_values)
         except Exception as e:
             print("-" * 50)
             print(f"An error occurred: {e}")
             print("Traceback:")
             traceback.print_exc()
-
 
 
 
@@ -298,7 +322,10 @@ def main():
 
         trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
 
-        evaluator_manager = EvaluatorManager(trainer)
+        # disable logging for evaluation
+        # tf.get_logger().setLevel('ERROR')
+
+        evaluator_manager = EvaluationManager(trainer)
         evaluator_manager.orchestrate_evaluation()
 
 
