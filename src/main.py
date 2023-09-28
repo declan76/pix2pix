@@ -296,11 +296,14 @@ class EvaluationManager(ModelManager):
 
             mse_values = self.evaluate_model(test_csv_path, checkpoint_path, save_images_path)
             self.save_evaluation_results(final_save_path, mse_values)
+
+
         except Exception as e:
             print("-" * 50)
             print(f"An error occurred: {e}")
             print("Traceback:")
             traceback.print_exc()
+
 
 
 
@@ -313,21 +316,11 @@ def main():
         training_manager.orchestrate_training()
     elif action == "e":
         generator, discriminator = ModelManager.create_and_build_models()
-
-        experiment_dir    = os.path.join(FileManager.EXPERIMENTS_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-        log_dir           = os.path.join(experiment_dir, "logs", "fit")
-        checkpoint_dir    = os.path.join(experiment_dir, "training_checkpoints")
-        summary_writer    = tf.summary.create_file_writer(log_dir)
-        checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-
-        trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
-
-        # disable logging for evaluation
-        # tf.get_logger().setLevel('ERROR')
+        trainer = Trainer(generator, discriminator, None, None, enable_logging=False)
 
         evaluator_manager = EvaluationManager(trainer)
         evaluator_manager.orchestrate_evaluation()
-
+        
 
 if __name__ == "__main__":
     main()
