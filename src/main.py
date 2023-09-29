@@ -10,6 +10,7 @@ from data.dataset import Dataset
 from pix2pix.train import Trainer
 from data.data_loader import DataLoader
 from pix2pix.generator import Generator
+from utils.visualise import generate_images
 from pix2pix.discriminator import Discriminator
 
 
@@ -156,17 +157,17 @@ class TrainingManager(ModelManager):
 
     def train_model(self, train_csv_path, test_csv_path, experiment_dir, checkpoint_path=None):
         train_data_loader = DataLoader(train_csv_path, train_csv_path)
-        train_dataset = Dataset(train_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+        train_dataset     = Dataset(train_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
-        test_dataset = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+        test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
 
         with open(os.path.join(experiment_dir, "hyperparameters.yaml"), "w") as file:
             yaml.dump(self.config, file)
 
-        log_dir = os.path.join(experiment_dir, "logs", "fit")
+        log_dir        = os.path.join(experiment_dir, "logs", "fit")
         checkpoint_dir = os.path.join(experiment_dir, "training_checkpoints")
 
         summary_writer = tf.summary.create_file_writer(log_dir)
@@ -191,20 +192,16 @@ class TrainingManager(ModelManager):
         try:
             experiment_dir = self.create_experiment_directory()
             
-            # Ask for training data directory
             training_data_dir = self.get_data_directory("training")
             FileManager.copy_data_to_experiment_folder(training_data_dir, os.path.join(experiment_dir, "data", "train"))
             train_csv_path = os.path.join(experiment_dir, "data", "train", "pairs.csv")
             
-            # Ask for test data directory
             test_data_dir = self.get_data_directory("test")
             FileManager.copy_data_to_experiment_folder(test_data_dir, os.path.join(experiment_dir, "data", "test"))
             test_csv_path = os.path.join(experiment_dir, "data", "test", "pairs.csv")
 
-            # Initialize checkpoint_path to None
             checkpoint_path = None
 
-            # Prompt for checkpoint
             if UserInputManager.query_yes_no("Would you like to use a checkpoint from a previous run?"):
                 checkpoint_path = self.prompt_for_checkpoint()
                 
@@ -229,9 +226,9 @@ class EvaluationManager(ModelManager):
         return os.path.join(base_dir, "evaluation")
 
     def get_final_save_path(self, checkpoint_path):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        timestamp       = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         checkpoint_name = os.path.basename(checkpoint_path)
-        folder_name = f"{timestamp}_{checkpoint_name}"
+        folder_name     = f"{timestamp}_{checkpoint_name}"
         return os.path.join(self.get_default_evaluation_path(checkpoint_path), folder_name)
 
     def save_evaluation_results(self, final_save_path, mse_values):
@@ -246,15 +243,15 @@ class EvaluationManager(ModelManager):
 
     def evaluate_model(self, test_csv_path, checkpoint_path, save_images_path):
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
-        test_dataset = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
+        test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
 
         checkpoint = tf.train.Checkpoint(
-            generator_optimizer=self.trainer.generator_optimizer,
-            discriminator_optimizer=self.trainer.discriminator_optimizer,
-            generator=self.trainer.generator.model,
-            discriminator=self.trainer.discriminator.model
+            generator_optimizer     = self.trainer.generator_optimizer,
+            discriminator_optimizer = self.trainer.discriminator_optimizer,
+            generator               = self.trainer.generator.model,
+            discriminator           = self.trainer.discriminator.model
         )
 
         status = checkpoint.restore(checkpoint_path)
@@ -262,16 +259,20 @@ class EvaluationManager(ModelManager):
 
         mse_values = {}
         for idx, (file_name, input_image, target) in enumerate(test_dataset):
-            prediction = generator.model(input_image, training=False)
-            mse_loss = tf.keras.losses.MeanSquaredError()(target, prediction)
+            prediction                                       = generator.model(input_image, training=True)
+            mse_loss                                         = tf.keras.losses.MeanSquaredError()(target, prediction)
             mse_values[file_name.numpy()[0].decode('utf-8')] = mse_loss.numpy()
             print(f"MSE for test file {file_name.numpy()[0].decode('utf-8')}: {mse_loss.numpy()}")
 
             # Save generated images if path is provided
             if save_images_path:
-                image_name = f"{file_name.numpy()[0].decode('utf-8')}_predicted.png"
-                image_path = os.path.join(save_images_path, image_name)
+                predicted_image_name = file_name.numpy()[0].decode('utf-8')
+                image_name           = f"{predicted_image_name}_predicted.png"
+                image_path           = os.path.join(save_images_path, image_name)
                 tf.keras.preprocessing.image.save_img(image_path, prediction[0])
+
+                generate_images(generator, input_image, target, predicted_image_name, save_images_path, mode='eval')
+
 
         avg_mse = sum(mse_values.values()) / len(mse_values)
         print(f"Average MSE on test data: {avg_mse}")
@@ -280,8 +281,8 @@ class EvaluationManager(ModelManager):
     def orchestrate_evaluation(self):
         try:
             checkpoint_path = self.prompt_for_checkpoint()
-            test_path = self.get_data_directory("test")
-            test_csv_path = os.path.join(test_path, "pairs.csv")
+            test_path       = self.get_data_directory("test")
+            test_csv_path   = os.path.join(test_path, "pairs.csv")
             if not os.path.exists(test_csv_path):
                 raise ValueError(f"No CSV file found in the provided test directory.")
 
@@ -316,7 +317,7 @@ def main():
         training_manager.orchestrate_training()
     elif action == "e":
         generator, discriminator = ModelManager.create_and_build_models()
-        trainer = Trainer(generator, discriminator, None, None, enable_logging=False)
+        trainer = Trainer(generator, discriminator, None, None)
 
         evaluator_manager = EvaluationManager(trainer)
         evaluator_manager.orchestrate_evaluation()
