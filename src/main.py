@@ -42,7 +42,7 @@ class FileManager:
         return os.path.exists(directory) and any(file.endswith(".csv") for file in os.listdir(directory))
 
     @staticmethod
-    def copy_data_to_experiment_folder(source_dir, dest_dir):
+    def copy_data_to_folder(source_dir, dest_dir):
         if os.path.exists(dest_dir):
             shutil.rmtree(dest_dir)
         shutil.copytree(source_dir, dest_dir)
@@ -168,11 +168,11 @@ class TrainingManager(ModelManager):
             experiment_dir = self.create_experiment_directory()
             
             training_data_dir = self.get_data_directory("training")
-            FileManager.copy_data_to_experiment_folder(training_data_dir, os.path.join(experiment_dir, "data", "train"))
+            FileManager.copy_data_to_folder(training_data_dir, os.path.join(experiment_dir, "data", "train"))
             train_csv_path = os.path.join(experiment_dir, "data", "train", "pairs.csv")
-            
-            test_data_dir = self.get_data_directory("test")
-            FileManager.copy_data_to_experiment_folder(test_data_dir, os.path.join(experiment_dir, "data", "test"))
+
+            test_data_dir = self.get_data_directory("testing")
+            FileManager.copy_data_to_folder(test_data_dir, os.path.join(experiment_dir, "data", "test"))
             test_csv_path = os.path.join(experiment_dir, "data", "test", "pairs.csv")
 
             checkpoint_path = None
@@ -192,9 +192,8 @@ class TrainingManager(ModelManager):
 
 
 class EvaluationManager(ModelManager):
-    def __init__(self, trainer: Trainer, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.trainer = trainer
 
     def get_default_evaluation_path(self, checkpoint_path):
         base_dir = os.path.dirname(os.path.dirname(checkpoint_path))
@@ -216,47 +215,46 @@ class EvaluationManager(ModelManager):
 
         print(f"Evaluation results saved to {mse_file_path}")
 
+
     def evaluate_model(self, test_csv_path, checkpoint_path, save_images_path):
+        # Ensure the checkpoint file exists
+        if not os.path.exists(checkpoint_path + ".index"):
+            raise ValueError(f"Checkpoint file {checkpoint_path}.index does not exist.")
+        
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
         test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
 
         generator, discriminator = self.create_and_build_models()
-
-        checkpoint = tf.train.Checkpoint(
-            generator_optimizer     = self.trainer.generator_optimizer,
-            discriminator_optimizer = self.trainer.discriminator_optimizer,
-            generator               = self.trainer.generator.model,
-            discriminator           = self.trainer.discriminator.model
-        )
-
-        status = checkpoint.restore(checkpoint_path)
+       
+        trainer = Trainer(generator, discriminator, None, None)
+        status  = trainer.checkpoint.restore(checkpoint_path)
         status.expect_partial()
 
         mse_values = {}
-        for idx, (file_name, input_image, target) in enumerate(test_dataset):
-            prediction                                       = generator.model(input_image, training=True)
+        for idx, (file_name, input, target) in enumerate(test_dataset):
+            prediction                                       = generator.model(input, training=True)
             mse_loss                                         = tf.keras.losses.MeanSquaredError()(target, prediction)
             mse_values[file_name.numpy()[0].decode('utf-8')] = mse_loss.numpy()
             print(f"MSE for test file {file_name.numpy()[0].decode('utf-8')}: {mse_loss.numpy()}")
 
             # Save generated images if path is provided
             if save_images_path:
-                predicted_image_name = file_name.numpy()[0].decode('utf-8')
-                image_name           = f"{predicted_image_name}_predicted.png"
-                image_path           = os.path.join(save_images_path, image_name)
+                taget_name = file_name.numpy()[0].decode('utf-8')
+                image_name = f"{taget_name}_predicted.png"
+                image_path = os.path.join(save_images_path, image_name)
                 tf.keras.preprocessing.image.save_img(image_path, prediction[0])
 
-                generate_images(generator, input_image, target, predicted_image_name, save_images_path, mode='eval')
-
+                generate_images(generator, input, target, taget_name, save_images_path, mode='eval')
 
         avg_mse = sum(mse_values.values()) / len(mse_values)
         print(f"Average MSE on test data: {avg_mse}")
         return mse_values
 
+
     def orchestrate_evaluation(self):
         try:
             checkpoint_path = self.prompt_for_checkpoint()
-            test_path       = self.get_data_directory("test")
+            test_path       = self.get_data_directory("testing")
             test_csv_path   = os.path.join(test_path, "pairs.csv")
             if not os.path.exists(test_csv_path):
                 raise ValueError(f"No CSV file found in the provided test directory.")
@@ -269,6 +267,8 @@ class EvaluationManager(ModelManager):
                 os.makedirs(save_images_path, exist_ok=True)
             else:
                 save_images_path = None
+
+            FileManager.copy_data_to_folder(test_path, os.path.join(final_save_path, "data", "test"))    
 
             mse_values = self.evaluate_model(test_csv_path, checkpoint_path, save_images_path)
             self.save_evaluation_results(final_save_path, mse_values)
@@ -284,6 +284,7 @@ class EvaluationManager(ModelManager):
 
 
 
+
 def main():
     action = UserInputManager.get_action()
 
@@ -291,10 +292,7 @@ def main():
         training_manager = TrainingManager()
         training_manager.orchestrate_training()
     elif action == "e":
-        generator, discriminator = ModelManager.create_and_build_models()
-        trainer = Trainer(generator, discriminator, None, None)
-
-        evaluator_manager = EvaluationManager(trainer)
+        evaluator_manager = EvaluationManager()
         evaluator_manager.orchestrate_evaluation()
         
 
