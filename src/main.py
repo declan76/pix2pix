@@ -37,24 +37,6 @@ class UserInputManager:
 
 
 class FileManager:
-    EXPERIMENTS_DIR = "./experiments"
-
-    @staticmethod
-    def load_config(config_path):
-        with open(config_path, "r") as file:
-            return yaml.safe_load(file)
-
-    @staticmethod
-    def get_available_checkpoints():
-        checkpoints = []
-        for experiment in os.listdir(FileManager.EXPERIMENTS_DIR):
-            checkpoint_dir = os.path.join(FileManager.EXPERIMENTS_DIR, experiment, "training_checkpoints")
-            if os.path.exists(checkpoint_dir):
-                for f in os.listdir(checkpoint_dir):
-                    if f.endswith(".index"):
-                        checkpoints.append((experiment, f))
-        return checkpoints
-
     @staticmethod
     def check_data_exists(directory):
         return os.path.exists(directory) and any(file.endswith(".csv") for file in os.listdir(directory))
@@ -65,16 +47,10 @@ class FileManager:
             shutil.rmtree(dest_dir)
         shutil.copytree(source_dir, dest_dir)
 
-    @staticmethod
-    def create_training_info_file(experiment_dir, **kwargs):
-        with open(os.path.join(experiment_dir, "training_info.txt"), "w") as file:
-            for key, value in kwargs.items():
-                file.write(f"{key.replace('_', ' ').title()}: {value}\n")
-
 
 
 class ModelManager:
-    EXPERIMENTS_DIR = "./experiments"
+    EXPERIMENTS_DIR      = "./experiments"
     HYPERPARAMETERS_PATH = "config/hyperparameters.yaml"
 
     def __init__(self):
@@ -85,10 +61,9 @@ class ModelManager:
             return yaml.safe_load(file)
 
     def get_available_checkpoints(self):
-        experiments_dir = "./experiments"
         checkpoints     = []
-        for experiment in os.listdir(experiments_dir):
-            checkpoint_dir = os.path.join(experiments_dir, experiment, "training_checkpoints")
+        for experiment in os.listdir(self.EXPERIMENTS_DIR):
+            checkpoint_dir = os.path.join(self.EXPERIMENTS_DIR, experiment, "training_checkpoints")
             if os.path.exists(checkpoint_dir):
                 for f in os.listdir(checkpoint_dir):
                     if f.endswith(".index"):
@@ -110,7 +85,7 @@ class ModelManager:
                 experiment, checkpoint = available_checkpoints[selection - 1]
                 print(f"You've selected checkpoint {checkpoint} from {experiment}/training_checkpoints. Proceeding with this checkpoint..")
                 checkpoint_path = os.path.join(
-                    FileManager.EXPERIMENTS_DIR,
+                    self.EXPERIMENTS_DIR,
                     experiment,
                     "training_checkpoints",
                     checkpoint.replace('.index', '')
@@ -170,15 +145,15 @@ class TrainingManager(ModelManager):
         log_dir        = os.path.join(experiment_dir, "logs", "fit")
         checkpoint_dir = os.path.join(experiment_dir, "training_checkpoints")
 
-        summary_writer = tf.summary.create_file_writer(log_dir)
+        summary_writer    = tf.summary.create_file_writer(log_dir)
         checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-        trainer = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
+        trainer           = Trainer(generator, discriminator, summary_writer, checkpoint_prefix)
 
         if checkpoint_path:
             trainer.checkpoint.restore(checkpoint_path)
 
         start_time = time.time()
-        trainer.fit(train_dataset, test_dataset, steps=self.config["hyperparameters"]["STEPS"], experiment_dir=experiment_dir)        
+        trainer.fit(train_dataset, test_dataset, steps=self.config["hyperparameters"]["STEPS"], experiment_dir=experiment_dir, save_freq=self.config["hyperparameters"]["SAVE_FREQ"])        
         end_time = time.time()
 
         total_time = end_time - start_time

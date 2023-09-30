@@ -53,7 +53,7 @@ class Trainer:
         return gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss
 
 
-    def fit(self, train_ds, test_ds, steps, experiment_dir):
+    def fit(self, train_ds, test_ds, steps, experiment_dir, save_freq):
         _, example_input, example_target = next(iter(test_ds.take(1)))
         start = time.time()
 
@@ -81,18 +81,14 @@ class Trainer:
                     table.add_row([f"{step//1000}k", "Generator GAN Loss", f"{gen_gan_loss_value:.4f}"])
                     table.add_row(["", "Generator L1 Loss", f"{gen_l1_loss_value:.4f}"])
                     table.add_row(["", "Discriminator Loss", f"{disc_loss_value:.4f}"])
-
                     print(table)
-
-                    # Call the generate_images function with the run_timestamp
-                    generate_images(self.generator, example_input, example_target, step, experiment_dir)
 
                 # Training step
                 if (step+1) % 10 == 0:
                     print('.', end='', flush=True)
 
-                # Save the model every 5k steps
-                if (step + 1) % 5000 == 0 or (step + 1) == steps:
+                # Save the model every  steps
+                if (step+1) % save_freq == 0 or (step+1) == steps:
                     self.checkpoint.save(file_prefix=self.checkpoint_prefix)
 
         except KeyboardInterrupt:

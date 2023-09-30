@@ -12,10 +12,7 @@ WORKDIR /app
 COPY . /app
 
 # Install system dependencies for pycairo
-RUN apt-get update && apt-get install -y \
-    libcairo2-dev \
-    pkg-config \
-    python3-dev
+RUN apt-get update && apt-get install -y libcairo2-dev 
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
