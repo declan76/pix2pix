@@ -55,10 +55,13 @@ def generate_images(model, input_image_tensor, target_image_tensor, input_filena
         filename  = f"{input_filename}.png"
         save_path = image_path
 
-    collage.save(os.path.join(save_path, filename))
+    final_image_path = os.path.join(save_path, filename)
+    collage.save(final_image_path)
     
     # Optionally, remove the individual images if you don't need them
     os.remove('input_image.png')
     os.remove('predicted_image.png')
     os.remove('target_image.png')
     os.remove('error_image.png')
+
+    return final_image_path

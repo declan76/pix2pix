@@ -6,8 +6,10 @@ import shutil
 import datetime
 import traceback
 import tensorflow as tf
+
 from data.dataset import Dataset
 from pix2pix.train import Trainer
+from utils.pdf_writer import PDFWriter
 from data.data_loader import DataLoader
 from pix2pix.generator import Generator
 from utils.visualise import generate_images
@@ -188,9 +190,6 @@ class TrainingManager(ModelManager):
 
 
 
-
-
-
 class EvaluationManager(ModelManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -203,7 +202,7 @@ class EvaluationManager(ModelManager):
         timestamp       = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         checkpoint_name = os.path.basename(checkpoint_path)
         folder_name     = f"{timestamp}_{checkpoint_name}"
-        return os.path.join(self.get_default_evaluation_path(checkpoint_path), folder_name)
+        return os.path.join(self.get_default_evaluation_path(checkpoint_path), folder_name), timestamp
 
     def save_evaluation_results(self, final_save_path, mse_values):
         os.makedirs(final_save_path, exist_ok=True)
@@ -231,6 +230,7 @@ class EvaluationManager(ModelManager):
         status.expect_partial()
 
         mse_values = {}
+        images     = []  # To store the paths of the top 3 and worst MSE images
         for idx, (file_name, input, target) in enumerate(test_dataset):
             prediction                                       = generator.model(input, training=True)
             mse_loss                                         = tf.keras.losses.MeanSquaredError()(target, prediction)
@@ -246,9 +246,23 @@ class EvaluationManager(ModelManager):
 
                 generate_images(generator, input, target, taget_name, save_images_path, mode='eval')
 
+        # Create temp folder to store images for PDF report
+        os.makedirs("temp", exist_ok=True)
+        
+        # Identify top 3 and worst MSE files
+        sorted_mse_items = sorted(mse_values.items(), key=lambda x: x[1])
+        top_3_files      = sorted_mse_items[:3]
+        worst_file       = sorted_mse_items[-1]
+
+        # Generate images for these files
+        for rank, (file_name, mse) in enumerate(top_3_files + [worst_file]):
+            _, input, target = next(filter(lambda x: x[0].numpy()[0].decode('utf-8') == file_name, test_dataset))
+            image_path       = generate_images(generator, input, target, file_name, "temp", mode='eval')
+            images.append((rank, image_path))
+
         avg_mse = sum(mse_values.values()) / len(mse_values)
         print(f"Average MSE on test data: {avg_mse}")
-        return mse_values
+        return mse_values, images  
 
 
     def orchestrate_evaluation(self):
@@ -259,7 +273,7 @@ class EvaluationManager(ModelManager):
             if not os.path.exists(test_csv_path):
                 raise ValueError(f"No CSV file found in the provided test directory.")
 
-            final_save_path = self.get_final_save_path(checkpoint_path)
+            final_save_path, timestamp = self.get_final_save_path(checkpoint_path)
 
             save_images = UserInputManager.query_yes_no("Do you want to save the generated images?")
             if save_images:
@@ -270,19 +284,17 @@ class EvaluationManager(ModelManager):
 
             FileManager.copy_data_to_folder(test_path, os.path.join(final_save_path, "data", "test"))    
 
-            mse_values = self.evaluate_model(test_csv_path, checkpoint_path, save_images_path)
+            mse_values, images = self.evaluate_model(test_csv_path, checkpoint_path, save_images_path)
             self.save_evaluation_results(final_save_path, mse_values)
 
+            # Generate PDF report with top images
+            PDFWriter.generate_pdf_report(checkpoint_path, timestamp, mse_values, final_save_path, images)
 
         except Exception as e:
             print("-" * 50)
             print(f"An error occurred: {e}")
             print("Traceback:")
             traceback.print_exc()
-
-
-
-
 
 
 def main():

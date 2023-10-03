@@ -1,0 +1,135 @@
+import os
+import shutil
+import numpy as np
+import matplotlib.pyplot as plt
+from fpdf import FPDF
+
+class PDFWriter:
+
+    def generate_box_and_whisker_plot(mse_values, save_path):
+        plt.figure(figsize=(10, 6))
+        
+        # Extract MSE values from the dictionary
+        mse_list = list(mse_values.values())
+        
+        # Boxplot with custom colors for quartiles
+        boxprops     = dict(linestyle='-', linewidth=1, color='black')
+        medianprops  = dict(linestyle='-', linewidth=1, color='red')
+        whiskerprops = dict(linestyle='-', linewidth=1, color='blue')
+        capprops     = dict(linestyle='-', linewidth=1, color='green')
+        
+        bp = plt.boxplot(mse_list, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskerprops, capprops=capprops)
+        
+        # Add grid lines to y-axis
+        plt.grid(axis='y')
+        
+        # Adjust y-axis to have more numbers on the scale and format them to have 6 decimal places
+        plt.yticks([tick for tick in plt.yticks()[0]], ['{:.6f}'.format(tick) for tick in plt.yticks()[0]])
+        
+        # Compute statistics
+        min_val    = np.min(mse_list)
+        q1_val     = np.percentile(mse_list, 25)
+        median_val = np.median(mse_list)
+        q3_val     = np.percentile(mse_list, 75)
+        max_val    = np.max(mse_list)
+        
+        # Display the values for min, max, median, Q1, and Q3 beside their respective lines
+        for line, value in zip(bp['medians'] + bp['whiskers'] + bp['caps'], [median_val, min_val, q1_val, q3_val, max_val]):
+            plt.text(1.05, line.get_ydata()[0], '{:.6f}'.format(value), va='center')
+        
+        plt.title("Box and Whisker Plot for MSE Values")
+        plt.ylabel("MSE Value")
+        plt.xlabel("Files")
+        
+        image_path = os.path.join(save_path, "mse_box_plot.png")
+        plt.savefig(image_path)
+        plt.close()
+        
+        return image_path
+    
+
+
+    def generate_histogram_plot(mse_values, save_path):
+        plt.figure(figsize=(10, 6))
+        
+        # Extract MSE values from the dictionary
+        mse_list = list(mse_values.values())
+        
+        # Plot histogram
+        plt.hist(mse_list, bins=30, color='skyblue', edgecolor='black')
+        
+        plt.title("Histogram of MSE Values")
+        plt.ylabel("Frequency")
+        plt.xlabel("MSE Value")
+        
+        image_path = os.path.join(save_path, "mse_histogram.png")
+        plt.savefig(image_path)
+        plt.close()
+        
+        return image_path
+
+
+
+    def generate_pdf_report(checkpoint_path, timestamp, mse_values, final_save_path, images):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        
+        # Title
+        pdf.set_font("Arial", 'B', 16)
+        pdf.cell(200, 10, "Evaluation Report", 0, 1, 'C')
+        
+        # Add checkpoint name and path
+        pdf.set_font("Arial", size=12)
+        pdf.ln(10)
+        pdf.cell(200, 10, f"Checkpoint: {os.path.basename(checkpoint_path)}", 0, 1)
+        pdf.cell(200, 10, f"Path: {checkpoint_path}", 0, 1)
+
+        # Add datetime
+        pdf.cell(200, 10, f"Date and Time: {timestamp}", 0, 1)
+        
+        # Add box and whisker plot for MSE values
+        mse_plot_path = PDFWriter.generate_box_and_whisker_plot(mse_values, final_save_path)
+        pdf.image(mse_plot_path, x = 10, y = pdf.get_y(), w = 190)  
+
+        # Add histogram plot for MSE values on a new page
+        pdf.add_page()
+        mse_histogram_path = PDFWriter.generate_histogram_plot(mse_values, final_save_path)
+        pdf.image(mse_histogram_path, x = 10, y = pdf.get_y(), w = 190)  
+
+        # Start table on a new page
+        pdf.add_page()
+        
+        # Set column widths based on specified percentages
+        table_width        = 190  
+        filename_col_width = 0.75 * table_width
+        mse_col_width      = 0.25 * table_width
+        
+        # Add table with all MSE values sorted by value
+        sorted_mse = sorted(mse_values.items(), key=lambda x: x[1])
+        pdf.cell(filename_col_width, 10, "File Name", 1)  # Column header
+        pdf.cell(mse_col_width, 10, "MSE Value", 1)  # Column header
+        pdf.ln()
+        for filename, mse in sorted_mse:
+            pdf.cell(filename_col_width, 10, filename, 1)
+            pdf.cell(mse_col_width, 10, str(mse), 1)
+            pdf.ln()
+
+        # Add the top images to the PDF
+        for rank, image_path in images:
+            pdf.add_page()
+            if rank < 3:
+                heading = f"{rank + 1} Lowest MSE Value - {os.path.basename(image_path).replace('_predicted.png', '')}"
+            else:
+                heading = f"Highest MSE Value - {os.path.basename(image_path).replace('_predicted.png', '')}"
+            pdf.set_font("Arial", 'B', 14)
+            pdf.cell(200, 10, heading, 0, 1, 'C')
+            pdf.image(image_path, x=10, y=pdf.get_y(), w=190)
+
+        # Delete the temp folder used to store images
+        shutil.rmtree("temp")
+        
+        # Save PDF to the evaluation folder
+        pdf_output_path = os.path.join(final_save_path, "evaluation_report.pdf")
+        pdf.output(pdf_output_path)
+        print(f"PDF report saved to {pdf_output_path}")
