@@ -1,13 +1,27 @@
 import time
 import tensorflow as tf
+
 from IPython import display
 from prettytable import PrettyTable
 from pix2pix.generator import Generator
+from utils.fits_handler import generate_images
 from pix2pix.discriminator import Discriminator
-from utils.visualise import generate_images
 
 class Trainer:
+    """
+    Trainer class for training a GAN model using the pix2pix architecture.
+    """
+
     def __init__(self, generator: Generator, discriminator: Discriminator, summary_writer, checkpoint_prefix):
+        """
+        Initialize the Trainer class.
+
+        Args:
+            generator (Generator): The generator model.
+            discriminator (Discriminator): The discriminator model.
+            summary_writer: TensorBoard summary writer.
+            checkpoint_prefix (str): Prefix for saving checkpoints.
+        """
         self.generator_optimizer     = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
         self.discriminator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
         self.generator               = generator
@@ -26,9 +40,19 @@ class Trainer:
         self.gen_l1_loss    = None
         self.disc_loss      = None
 
-
     @tf.function
     def train_step(self, input_image, target, step):
+        """
+        Perform a single training step.
+
+        Args:
+            input_image: Input image tensor.
+            target: Target tensor.
+            step (int): Current training step.
+
+        Returns:
+            Tuple containing generator total loss, generator GAN loss, generator L1 loss, and discriminator loss.
+        """
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             gen_output = self.generator.model(input_image, training=True)
 
@@ -52,8 +76,17 @@ class Trainer:
 
         return gen_total_loss, gen_gan_loss, gen_l1_loss, disc_loss
 
-
     def fit(self, train_ds, test_ds, steps, experiment_dir, save_freq):
+        """
+        Train the GAN model.
+
+        Args:
+            train_ds: Training dataset.
+            test_ds: Testing dataset.
+            steps (int): Total number of training steps.
+            experiment_dir (str): Directory for saving experiment results.
+            save_freq (int): Frequency for saving checkpoints and generating sample images.
+        """
         _, example_input, example_target = next(iter(test_ds.take(1)))
         start = time.time()
 

@@ -1,5 +1,7 @@
 # Use an official Tensorflow runtime as a parent image. 
-# Comment out either the GPU or CPU version depending on your system.
+
+
+# ***Comment out either the GPU or CPU version depending on your system.***
 # FOR GPU VERSION: 
 FROM tensorflow/tensorflow:2.13.0-gpu
 # FOR CPU VERSION:

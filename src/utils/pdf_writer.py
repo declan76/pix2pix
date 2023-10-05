@@ -2,11 +2,24 @@ import os
 import shutil
 import numpy as np
 import matplotlib.pyplot as plt
+
 from fpdf import FPDF
 
 class PDFWriter:
-
+    """
+    A class to generate PDF reports based on Mean Squared Error (MSE) values.
+    """
     def generate_box_and_whisker_plot(mse_values, save_path):
+        """
+        Generate a box and whisker plot for the given MSE values.
+
+        Parameters:
+        - mse_values (dict): Dictionary containing MSE values.
+        - save_path (str): Path to save the generated plot.
+
+        Returns:
+        - str: Path to the saved plot image.
+        """
         plt.figure(figsize=(10, 6))
         
         # Extract MSE values from the dictionary
@@ -48,8 +61,17 @@ class PDFWriter:
         return image_path
     
 
-
     def generate_histogram_plot(mse_values, save_path):
+        """
+        Generate a histogram for the given MSE values.
+
+        Parameters:
+        - mse_values (dict): Dictionary containing MSE values.
+        - save_path (str): Path to save the generated histogram.
+
+        Returns:
+        - str: Path to the saved histogram image.
+        """
         plt.figure(figsize=(10, 6))
         
         # Extract MSE values from the dictionary
@@ -69,8 +91,21 @@ class PDFWriter:
         return image_path
 
 
-
     def generate_pdf_report(checkpoint_path, timestamp, mse_values, final_save_path, images):
+        """
+        Generate a PDF report based on the given MSE values and images.
+
+        Parameters:
+        - checkpoint_path (str): Path to the checkpoint file.
+        - timestamp (str): Date and time of the report generation.
+        - mse_values (dict): Dictionary containing MSE values.
+        - final_save_path (str): Path to save the final PDF report.
+        - images (list): List of image paths to be included in the report.
+
+        Note:
+        - The generated report will include a box and whisker plot, histogram, and a table of MSE values.
+        - The report will also include the top images based on MSE values.
+        """
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)

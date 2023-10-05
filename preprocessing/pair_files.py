@@ -51,21 +51,9 @@ def write_to_csv(directory, save_directory, output_file="pairs.csv"):
 
 
 if __name__ == "__main__":
-    directory = input("Enter the directory path (default is 'data_set/data'): ")
-    if not directory:
-        directory = "data_set/data"
-
-    save_directory = input(
-        "Enter the directory to save the CSV (default is 'data_set'): "
-    )
-    if not save_directory:
-        save_directory = "data_set"
-
-    output_file = input(
-        "Enter the desired output CSV filename (default is 'pairs.csv'): "
-    )
-    if not output_file:
-        output_file = "pairs.csv"
+    directory = input("Enter the directory path: ")
+    save_directory = input("Enter the directory to save the CSV: ")
+    output_file = "pairs.csv"
 
     write_to_csv(directory, save_directory, output_file)
     print(f"File pairs written to {os.path.join(save_directory, output_file)}")

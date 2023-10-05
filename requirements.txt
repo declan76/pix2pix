@@ -24,6 +24,7 @@ drms==0.6.4
 executing==1.2.0
 flatbuffers==23.5.26
 fonttools==4.42.0
+fpdf==1.7.2
 frozenlist==1.4.0
 gast==0.4.0
 google-auth==2.21.0
@@ -64,6 +65,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
+pycairo==1.25.0
 pyerfa==2.0.0.3
 Pygments==2.16.1
 PyGObject==3.36.0

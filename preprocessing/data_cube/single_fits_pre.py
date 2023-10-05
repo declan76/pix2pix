@@ -1,23 +1,24 @@
-"""
-Declan Keir 
-
-29/08/2023
-"""
-
-import math
 import os
-from astropy.io import fits
+import math
 import numpy as np
+from astropy.io import fits
 
 
 def distance_to_disk_centre(crlt_obs, crln_obs, crlt_ref, crln_ref):
-    # input values in degrees
+    """
+    Calculate the distance to the disk center.
 
-    # convert to radians
-    crln_ref = crln_ref * np.pi / 180.0
-    crlt_ref = crlt_ref * np.pi / 180.0
-    crln_obs = crln_obs * np.pi / 180.0
-    crlt_obs = crlt_obs * np.pi / 180.0
+    Parameters:
+        crlt_obs, crln_obs (float): Observer's latitude and longitude in degrees.
+        crlt_ref, crln_ref (float): Reference latitude and longitude in degrees.
+
+    Returns:
+        float: Distance to the disk center in radians.
+    """
+    # Convert to radians
+    crln_ref, crlt_ref, crln_obs, crlt_obs = [
+        angle * np.pi / 180.0 for angle in [crln_ref, crlt_ref, crln_obs, crlt_obs]
+    ]
 
     dlon = abs(crln_obs - crln_ref)
 
@@ -25,12 +26,20 @@ def distance_to_disk_centre(crlt_obs, crln_obs, crlt_ref, crln_ref):
         math.sin(crlt_obs) * math.sin(crlt_ref)
         + math.cos(crlt_obs) * math.cos(crlt_ref) * math.cos(dlon)
     )
-    # distance=acos( cos(!dpi/2.-CRLT_OBS)*cos(!dpi/2.-CRLT_REF) + sin(!dpi/2.-CRLT_OBS)*sin(!dpi/2.-CRLT_REF)*cos(dlon)  )
-    return distance  # in radians    (*180./!dpi for degrees)
+    return distance
 
 
 def remove_2dplane(array):
-    m = array.shape[0]  # assume it is square!
+    """
+    Remove a 2D plane from the array.
+
+    Parameters:
+        array (np.array): Input 2D array.
+
+    Returns:
+        np.array: Array after removing the 2D plane.
+    """
+    m = array.shape[0]  # Assume it is square!
 
     X1, X2 = np.mgrid[:m, :m]
     X = np.hstack((np.reshape(X1, (m * m, 1)), np.reshape(X2, (m * m, 1))))
@@ -40,15 +49,19 @@ def remove_2dplane(array):
     plane = np.reshape(np.dot(X, theta), (m, m))
     sub = array - plane
 
-    # plt.imshow(array)
-    # plt.show()
-    # plt.imshow(sub)
-    # plt.show()
     return sub
 
 
 def read_fits(file_path):
-    """Read a FITS file and return its data."""
+    """
+    Read a FITS file and return its data.
+
+    Parameters:
+        file_path (str): Path to the FITS file.
+
+    Returns:
+        np.array: Data from the FITS file.
+    """
     with fits.open(file_path) as hdul:
         data = hdul[1].data
         if data is None:
@@ -57,17 +70,36 @@ def read_fits(file_path):
 
 
 def duplicate_data(data, channels=3):
-    """Duplicate the FITS data to fit into the required channels."""
-    duplicated_data = np.stack([data] * channels, axis=-1)
-    return duplicated_data
+    """
+    Duplicate the FITS data to fit into the required channels.
+
+    Parameters:
+        data (np.array): Input data.
+        channels (int, optional): Number of channels. Defaults to 3.
+
+    Returns:
+        np.array: Duplicated data.
+    """
+    return np.stack([data] * channels, axis=-1)
 
 
 def normalize_data(data, data_type, header=None):
-    magnetogram_factor  = 4000.0    # gauss
-    intensity_factor    = 50000.0   # ?
-    divergence_factor   = 100.0     # cm/s
+    """
+    Normalize the data based on the data type.
 
-    if data_type == 1:      # Magnetogram
+    Parameters:
+        data (np.array): Input data.
+        data_type (int): Type of the data (1 for magnetogram, 2 for intensity, 3 for divergence).
+        header (dict, optional): Header information. Defaults to None.
+
+    Returns:
+        np.array: Normalized data.
+    """
+    magnetogram_factor = 4000.0  # Gauss
+    intensity_factor = 50000.0
+    divergence_factor = 100.0  # cm/s
+
+    if data_type == 1:  # Magnetogram
         if header:
             theta = distance_to_disk_centre(
                 header["CRLT_OBS"],
@@ -77,22 +109,37 @@ def normalize_data(data, data_type, header=None):
             )
             data = data / math.cos(theta)
         return data / magnetogram_factor
-    elif data_type == 2:    # Intensity
-        data = remove_2dplane(data)
-        return data / intensity_factor
-    elif data_type == 3:    # Divergence
+    elif data_type == 2:  # Intensity
+        return remove_2dplane(data) / intensity_factor
+    elif data_type == 3:  # Divergence
         return data / divergence_factor
     else:
         raise ValueError(f"Unknown data type: {data_type}")
 
 
 def resize_data(data, target_shape=(256, 256)):
-    """Resize the data using either cropping or interpolation."""
-    cropped_data = data[: target_shape[0], : target_shape[1], :]
-    return cropped_data
-    
+    """
+    Resize the data using either cropping or interpolation.
+
+    Parameters:
+        data (np.array): Input data.
+        target_shape (tuple, optional): Target shape for resizing. Defaults to (256, 256).
+
+    Returns:
+        np.array: Resized data.
+    """
+    return data[: target_shape[0], : target_shape[1], :]
+
 
 def process_directory(input_dir, output_dir, data_type):
+    """
+    Process FITS files in the input directory and save them in the output directory.
+
+    Parameters:
+        input_dir (str): Directory containing the input FITS files.
+        output_dir (str): Directory to save the processed FITS files.
+        data_type (int): Type of the FITS file (1 for magnetogram, 2 for intensity, 3 for divergence).
+    """
     for file_name in os.listdir(input_dir):
         if file_name.endswith(".fits"):
             file_path = os.path.join(input_dir, file_name)
