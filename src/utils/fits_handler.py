@@ -28,7 +28,9 @@ def read_fits(file_path, file_path_str=None):
     with fits.open(file_path_str) as hdul:
         data = hdul[0].data
         if data is None:
-            raise ValueError(f"Error: No data in FITS file: {file_path_str}")
+            print(50*"-")
+            print(f"Error: No data in FITS file: {file_path_str}")
+            raise ValueError
     
     return data
 

@@ -85,7 +85,9 @@ class EvaluationManager(ModelManager):
         """
         # Ensure the checkpoint file exists
         if not os.path.exists(checkpoint_path + ".index"):
-            raise ValueError(f"Checkpoint file {checkpoint_path}.index does not exist.")
+            print(50*"-")
+            print(f"Checkpoint file {checkpoint_path}.index does not exist.")
+            raise ValueError
         
         test_data_loader = DataLoader(test_csv_path, test_csv_path)
         test_dataset     = Dataset(test_data_loader, self.config["hyperparameters"]["BUFFER_SIZE"], self.config["hyperparameters"]["BATCH_SIZE"]).create_dataset()
@@ -106,14 +108,10 @@ class EvaluationManager(ModelManager):
 
             # Save generated images if path is provided
             if save_images_path:
-                taget_name = file_name.numpy()[0].decode('utf-8')
-                image_name_png = f"{taget_name}_predicted.png"
-                image_path = os.path.join(save_images_path, image_name_png)
-                tf.keras.preprocessing.image.save_img(image_path, prediction[0])
-
-                image_name_fits = f"{taget_name}_predicted.fits" 
-                fits_path = os.path.join(save_images_path, image_name_fits)
-                prediction_np = prediction[0].numpy()
+                taget_name      = file_name.numpy()[0].decode('utf-8')
+                image_name = f"{taget_name}_predicted.fits"
+                fits_path       = os.path.join(save_images_path, image_name)
+                prediction_np   = prediction[0].numpy()
                 fits.writeto(fits_path, prediction_np, overwrite=True)
 
                 generate_images(generator, input, target, taget_name, save_images_path, mode='eval')
@@ -147,7 +145,9 @@ class EvaluationManager(ModelManager):
             test_path       = self.get_data_directory("testing")
             test_csv_path   = os.path.join(test_path, "pairs.csv")
             if not os.path.exists(test_csv_path):
-                raise ValueError(f"No CSV file found in the provided test directory.")
+                print(50*"-")
+                print(f"No CSV file found in the provided test directory.")
+                raise ValueError
 
             final_save_path, timestamp = self.get_final_save_path(checkpoint_path)
 

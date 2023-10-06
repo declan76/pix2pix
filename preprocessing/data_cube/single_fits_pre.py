@@ -65,7 +65,9 @@ def read_fits(file_path):
     with fits.open(file_path) as hdul:
         data = hdul[1].data
         if data is None:
-            raise ValueError(f"Error: No data in FITS file: {file_path}")
+            print(50*"-")
+            print(f"Error: No data in FITS file: {file_path}")
+            raise ValueError
     return data
 
 
@@ -114,7 +116,9 @@ def normalize_data(data, data_type, header=None):
     elif data_type == 3:  # Divergence
         return data / divergence_factor
     else:
-        raise ValueError(f"Unknown data type: {data_type}")
+        print(50*"-")
+        print(f"Unknown data type: {data_type}")
+        raise ValueError
 
 
 def resize_data(data, target_shape=(256, 256)):

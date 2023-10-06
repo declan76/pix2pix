@@ -106,7 +106,9 @@ class ModelManager:
         if FileManager.check_data_exists(data_dir):
             return data_dir
         else:
-            raise ValueError(f"No CSV file found in the provided {data_type} directory.")
+            print(50*"-")
+            print(f"No CSV file found in the provided {data_type} directory.")
+            raise ValueError
     
     @staticmethod
     def create_and_build_models():

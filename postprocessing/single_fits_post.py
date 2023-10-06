@@ -50,8 +50,10 @@ class PostProcessFITS:
         elif data_type == 3:  # Divergence
             return data * divergence_factor
         else:
-            raise ValueError(f"Unknown data type: {data_type}")
-
+            print(50*"-")
+            print(f"Unknown data type: {data_type}")
+            raise ValueError
+        
     def combine_channels(self, data):
         """
         Combines the 3 channels into a single channel by averaging.
