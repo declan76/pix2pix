@@ -1,4 +1,4 @@
-# Pix2Pix - FITS Files
+# Pix2Pix - FITS
 
 This code base provides a streamlined system for the Pix2Pix model, optimized for image-to-image translation with [FITS](https://fits.gsfc.nasa.gov/fits_home.html) files. Leveraging the TensorFlow framework, the implementation is dockerized for consistent performance across different platforms. Comprehensive documentation guides users through each step, from pre-processing to post-processing, simplifying the process of training and evaluating the model.
 
@@ -14,7 +14,7 @@ This code base provides a streamlined system for the Pix2Pix model, optimized fo
 
 ## Table of Contents
 
-- [Pix2Pix - FITS Files](#pix2pix---fits-files)
+- [Pix2Pix - FITS](#pix2pix---fits)
   - [Table of Contents](#table-of-contents)
   - [System Overview](#system-overview)
     - [I. Pre-processing Phase](#i-pre-processing-phase)
@@ -71,7 +71,7 @@ This code base provides a streamlined system for the Pix2Pix model, optimized fo
 This phase prepares the data for the pix2pix model. Detailed steps and scripts related to pre-processing can be found [here](https://github.com/declan76/pix2pix/tree/main/preprocessing#readme).
 
 **1. Data Augmentation**:
-  - **Status**: Feature in development.
+  - **Status**: Not developed.
   - **Details**:
     - **Flipping**: Images are mirrored along their vertical axis.
     - **Magnetic Field Adjustment**: Images are multiplied by -1 to maintain magnetic field polarity.
