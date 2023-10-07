@@ -1,0 +1,28 @@
+flowchart TD
+
+    START[START]
+
+    subgraph A[Pre-processing]
+        A1[Data Augmentation - TBD]
+        A1 --> A2{Create Data Cube}
+        A2 -->|Option 1 - Single Fits File| A2a[Run preprocessing/data_cube/single_fits_pre.py]
+        A2 -->|Option 2 - Three Fits Files| A2b[Run preprocessing/data_cube/three_fits_pre.py]
+        A2a --> A3[Pair Input and Target Fits]
+        A2b --> A3
+        A3 --> A4[Split Dataset]
+    end
+
+    subgraph B[Main Application]
+        A4 --> B1[Train Model]
+        B1 --> B2[Evaluate Model]
+    end
+
+    subgraph C[Post-processing]
+        B2 --> C1{Convert Data}
+        C1 -->|Option 1 - Convert to Single Fits File| C1a[Run postprocessing/single_fits_post.py]
+        C1 -->|Option 2 - Future Development| C1b[Counterpart of three_fits_pre.py - TBD]
+    end
+
+    C1a --> END[END]
+    C1b --> END
+    START --> A1
