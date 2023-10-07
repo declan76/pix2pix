@@ -1,90 +1,172 @@
-# Pix2Pix 
+# Pix2Pix - FITS Files
 
-pre processing 
-[![](https://mermaid.ink/img/pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk)
-
-
-main 
-[![](https://mermaid.ink/img/pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g)
-
-
-post processing 
-[![](https://mermaid.ink/img/pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi)
-
+This code base provides a streamlined system for the Pix2Pix model, optimized for image-to-image translation with [FITS](https://fits.gsfc.nasa.gov/fits_home.html) files. Leveraging the TensorFlow framework, the implementation is dockerized for consistent performance across different platforms. Comprehensive documentation guides users through each step, from pre-processing to post-processing, simplifying the process of training and evaluating the model.
 
 
 - This code is based on the [TensorFlow](https://www.tensorflow.org/tutorials/generative/pix2pix) implementation of Pix2Pix. 
 - The original Pix2Pix paper can be found at [Image-to-image translation with conditional adversarial networks](https://arxiv.org/abs/1611.07004).
 
-  > Isola, P., Zhu, J. Y., Zhou, T., & Efros, A. A. (2017). Image-to-image translation with conditional adversarial networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1125-1134).
+> Isola, P., Zhu, J. Y., Zhou, T., & Efros, A. A. (2017). Image-to-image translation with conditional adversarial networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1125-1134).
 
-# Class Diagrams
-## Preprocessing 
-[![](https://mermaid.ink/img/pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk)
+--- 
 
-## Main Application 
-[![](https://mermaid.ink/img/pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g)
 
-## Post-processing 
-[![](https://mermaid.ink/img/pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi)
+
+## Table of Contents
+
+- [Pix2Pix - FITS Files](#pix2pix---fits-files)
+  - [Table of Contents](#table-of-contents)
+  - [System Overview](#system-overview)
+    - [I. Pre-processing Phase](#i-pre-processing-phase)
+    - [II. Main Application Phase](#ii-main-application-phase)
+    - [III. Post-processing Phase](#iii-post-processing-phase)
+  - [Class Diagrams](#class-diagrams)
+    - [Preprocessing](#preprocessing)
+    - [Main Application](#main-application)
+    - [Post-processing](#post-processing)
+  - [Visual Studio Code](#visual-studio-code)
+    - [Essential Extensions for VS Code](#essential-extensions-for-vs-code)
+    - [Container Attachment](#container-attachment)
+  - [Docker](#docker)
+    - [An Overview of Docker Containerization](#an-overview-of-docker-containerization)
+      - [Isolation Principle](#isolation-principle)
+      - [File Integration and Access](#file-integration-and-access)
+    - [Installation](#installation)
+      - [Ubuntu and Debian-based Linux Distros](#ubuntu-and-debian-based-linux-distros)
+          - [1. Uninstall Old Docker Versions](#1-uninstall-old-docker-versions)
+          - [2. Install Docker Using the APT Repository](#2-install-docker-using-the-apt-repository)
+          - [3. Install Docker Engine](#3-install-docker-engine)
+          - [4. Addressing Permission Issues](#4-addressing-permission-issues)
+      - [Windows](#windows)
+      - [macOS](#macos)
+    - [Setup](#setup)
+      - [CPU-Only Environments on Linux, Windows, and macOS](#cpu-only-environments-on-linux-windows-and-macos)
+        - [1. Create a Docker Image from the Dockerfile](#1-create-a-docker-image-from-the-dockerfile)
+        - [2. Build Docker Container from the Image](#2-build-docker-container-from-the-image)
+      - [GPU-Accelerated Environments on Ubuntu and Debian-based Linux Distros](#gpu-accelerated-environments-on-ubuntu-and-debian-based-linux-distros)
+        - [Prerequisites](#prerequisites)
+          - [1. NVIDIA Container Toolkit Installation](#1-nvidia-container-toolkit-installation)
+          - [1.1. Install NVIDIA Container Toolkit](#11-install-nvidia-container-toolkit)
+          - [1.2. Generate a CDI Specification](#12-generate-a-cdi-specification)
+          - [1.3. Setting up NVIDIA Container Toolkit](#13-setting-up-nvidia-container-toolkit)
+          - [2. Pull TensorFlow GPU Docker Image](#2-pull-tensorflow-gpu-docker-image)
+          - [3. Pull CUDA Docker Image](#3-pull-cuda-docker-image)
+        - [5. Build Docker Container](#5-build-docker-container)
+          - [5.1. Create a Docker Image from the Dockerfile](#51-create-a-docker-image-from-the-dockerfile)
+          - [5.2. Build Docker Container from the Image](#52-build-docker-container-from-the-image)
+        - [GPU Monitoring](#gpu-monitoring)
+    - [Docker Management](#docker-management)
+  - [Training](#training)
+    - [I. Running the Training Script](#i-running-the-training-script)
+    - [II. Model Configuration](#ii-model-configuration)
+    - [III. Training Progress](#iii-training-progress)
+    - [IV. Monitoring with TensorBoard](#iv-monitoring-with-tensorboard)
+  - [Evaluation](#evaluation)
+    - [Running the Evaluation Script](#running-the-evaluation-script)
+
 
 
 ## System Overview
 ### I. Pre-processing Phase
-This phase prepares the data for the pix2pix model. Detailed steps and scripts related to pre-processing can be found in preprocessing/README.md.
+This phase prepares the data for the pix2pix model. Detailed steps and scripts related to pre-processing can be found [here](https://github.com/declan76/pix2pix/tree/main/preprocessing#readme).
 
-1. Data Augmentation:
-    - Status: Feature in development (preprocessing/augmentation.py).
-    - Details:
-        - Flipping: Images are mirrored along their vertical axis.
-        - Magnetic Field Adjustment: Images are multiplied by -1 to maintain magnetic field polarity.
+**1. Data Augmentation**:
+  - **Status**: Feature in development.
+  - **Details**:
+    - **Flipping**: Images are mirrored along their vertical axis.
+    - **Magnetic Field Adjustment**: Images are multiplied by -1 to maintain magnetic field polarity.
+  - **Script**: [augmentation.py](https://github.com/declan76/pix2pix/blob/main/preprocessing/augmentation.py)
 
-2. Data Cube Creation:
-    - Purpose: Generate a three-channel fits file.
-        - Option 1: Use a single fits file. Script: preprocessing/data_cube/single_fits_pre.py.
-        - Option 2: Use three separate fits files. Script: preprocessing/data_cube/three_fits_pre.py.
+**2. Data Cube Creation**:
+  - **Purpose**: Generate a three-channel fits file. Two approaches are available:
+      - **Option 1**: Use a single fits file. 
+        **Script**: [single_fits_pre.py](https://github.com/declan76/pix2pix/blob/main/preprocessing/data_cube/single_fits_pre.py).
+      - **Option 2**: Use three separate fits files. 
+       **Script**: [three_fits_pre.py](https://github.com/declan76/pix2pix/blob/main/preprocessing/data_cube/three_fits_pre.py).
+        
         **Note**: A corresponding post-processing script has not been developed.
 
-3. Input and Target Fits Pairing:
-    - Purpose: Generate a CSV file with fits file pairs using the Active Region ID (AR) and time step from the fits filename. Script: preprocessing/pair_files.py.
+**3. Input and Target Fits Pairing**:
+  - **Purpose**: Generate a CSV file with fits file pairs using the Active Region ID (AR) and time step from the fits filename. 
+  - **Script**: [pair_files.py](https://github.com/declan76/pix2pix/blob/main/preprocessing/pair_files.py).
 
-4. Dataset Splitting:
-    - Purpose: Divide the dataset into training and testing subsets.
-    - Implementation: The preprocessing/split_data.py script handles this, creating separate training and testing directories with associated pairs.csv files. The split ratio is user-defined.
+**4. Dataset Splitting**:
+  - **Purpose**: Divide the dataset into training and testing subsets. Creates separate training and testing directories with associated pairs.csv files. The split ratio is user-defined.
+  - **Script**: [split_dataset.py](https://github.com/declan76/pix2pix/blob/main/preprocessing/split_data.py)
 
 ### II. Main Application Phase
-5. Model Training:
-    - Purpose: Train the model using a version of pix2pix adapted for fits files.
-    - Features:
-        - Checkpoints: Save model states and sample images at intervals defined in config/hyperparameters.yaml.
-        - Logging: Training data, logs, and hyperparameters are saved in a timestamped directory in the experiments folder.
-    - Storage: Results are saved in the timestamped experiments directory.
+**5. Model Training**:
+  - **Purpose**: Train the model using a version of pix2pix adapted for fits files.
+  - **Features**:
+    - **Checkpoints**: Save model states and sample images at intervals defined in config/hyperparameters.yaml.
+    - **Logging**: Training data, logs, and hyperparameters are saved in a timestamped directory in the experiments folder.
+  - **Storage**: Results are saved in the timestamped experiments directory.
+  - **Script**: [main.py](https://github.com/declan76/pix2pix/blob/main/src/main.py) 
 
-6. Model Evaluation:
-    - Purpose: Test the trained model using Mean Squared Error (MSE).
-    - Outputs:
-        - A CSV file with MSE values.
-        - A comparison collage: input images at t1, target images at t2, predicted images at t2, and error images.
-        - MSE visualizations: Box plots and histograms.
-        -  A PDF report summarizing the evaluation results.
-    - Storage: Results are saved in the evaluation sub-folder in the timestamped experiments directory.
+**6. Model Evaluation**:
+  - **Purpose**: Test the trained model using Mean Squared Error (MSE).
+  - **Outputs**:
+    - A CSV file with MSE values.
+    - A comparison collage: input images at t1, target images at t2, predicted images at t2, and error images.
+    - MSE visualizations: Box plots and histograms.
+    -  A PDF report summarizing the evaluation results.
+  - **Storage**: Results are saved in the evaluation sub-folder in the timestamped experiments directory.
+  - **Script**: [main.py](https://github.com/declan76/pix2pix/blob/main/src/main.py) 
 
 ### III. Post-processing Phase
-7. Data Conversion:
-   - Purpose: Convert the three-channel fits file back to individual fits files.
-        - Option 1: Convert the predicted data cube to a single fits file by averaging channels and denormalizing based on input type. Script: postprocessing/single_fits_post.py.
-        - Option 2: This feature, which will be the counterpart to preprocessing/data_cube/three_fits_pre.py script. 
+**7. Data Conversion**:
+   - **Purpose**: Convert the three-channel fits file back to individual fits files.
+        - **Option 1**: Convert the predicted data cube to a single fits file by averaging channels and denormalizing based on input type. **Script**: [single_fits_post.py](https://github.com/declan76/pix2pix/blob/main/postprocessing/single_fits_post.py).
+        - **Option 2**: This feature, which will be the counterpart to preprocessing/data_cube/three_fits_pre.py script. 
         **Note**: This script is yet to be developed.
 
 [![](https://mermaid.ink/img/pako:eNp9VNGOojAU_ZWmz-hIEVAeNgF0kn1w14w8LRhToCoJtE0p7jiO_76l6CzsONsEArfnnnPbc9sLzFhOoAf3JfudHbGQIFokNKFAjU3kv0Sxfm_vsbpJDwLzI_DjtSAjLlhG6rqgh2033w7fjBdYYuA3h4pQiWXBKBiBKFgMQGA0-gZ8dAkFwZIAnRI2Kbn2QKgFvf_kmkJlgI2SKgl4LmStXiV5VxgcvzQUcEH-VvOUK7Zdptieap2x26uMncKM-Xn7lQBqqzwK0uOvW4H0vwKyzfiSH3fLtOI1LgT4TnkjAaY5iLA4EKmFBvj0hu_FrC40jTe8LKTeqJrIWxah-SdvgniFCwp8rvCZ3v6-xFTTBWYciRa1Ug1Q9uaDzpgAxcsTLpvWmj7kkV4Yr1ktHzdDoHcYhOYlZPRERFd_z-PQ_NfjO1CyB3aH5s1updizY-CymhraMNRobX5uZCNU05ETKRlv27SlTuOQNVQSwduTwPbgk7eDPu7thSpLr3P5YxGrZ3uPpvdo70h1dpoJhQasiKhwkasTeGkRCZRHUpEEeuozVTYn0Ojie0ZlXbzdppzJhL8mMKFXxYEbyTZnmkFPioYYsOGqOcmiwMqdCnp7XNYf0WVeSCY-ghzTX4xV90z1C70LfIWeaVtjNDNtNHXsGZpYJjLgGXoj0x0jx0XudGY7tuNaM-tqwDdNMRnPkes4aG65E3c-c23bgETLrbo7Rl811z-AWl3J?type=png)](https://mermaid.live/edit#pako:eNp9VNGOojAU_ZWmz-hIEVAeNgF0kn1w14w8LRhToCoJtE0p7jiO_76l6CzsONsEArfnnnPbc9sLzFhOoAf3JfudHbGQIFokNKFAjU3kv0Sxfm_vsbpJDwLzI_DjtSAjLlhG6rqgh2033w7fjBdYYuA3h4pQiWXBKBiBKFgMQGA0-gZ8dAkFwZIAnRI2Kbn2QKgFvf_kmkJlgI2SKgl4LmStXiV5VxgcvzQUcEH-VvOUK7Zdptieap2x26uMncKM-Xn7lQBqqzwK0uOvW4H0vwKyzfiSH3fLtOI1LgT4TnkjAaY5iLA4EKmFBvj0hu_FrC40jTe8LKTeqJrIWxah-SdvgniFCwp8rvCZ3v6-xFTTBWYciRa1Ug1Q9uaDzpgAxcsTLpvWmj7kkV4Yr1ktHzdDoHcYhOYlZPRERFd_z-PQ_NfjO1CyB3aH5s1updizY-CymhraMNRobX5uZCNU05ETKRlv27SlTuOQNVQSwduTwPbgk7eDPu7thSpLr3P5YxGrZ3uPpvdo70h1dpoJhQasiKhwkasTeGkRCZRHUpEEeuozVTYn0Ojie0ZlXbzdppzJhL8mMKFXxYEbyTZnmkFPioYYsOGqOcmiwMqdCnp7XNYf0WVeSCY-ghzTX4xV90z1C70LfIWeaVtjNDNtNHXsGZpYJjLgGXoj0x0jx0XudGY7tuNaM-tqwDdNMRnPkes4aG65E3c-c23bgETLrbo7Rl811z-AWl3J)
 
+---
+
+## Class Diagrams
+### Preprocessing 
+[![](https://mermaid.ink/img/pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNqVVVFr20AM_ivmnhLqldHRMQJ5GJTCXkYhfTQc2llOjp7vjE7ulpX898lO4iRnp3Q2GHH6JH2WPtlvyoQS1UIZBzE-WFgT1IXv7uxw9Z7se7uu0TOwDT57O3m760Zr6y1rPYvoqvnJuTuZab4nsPRoHcY02afQctOyrsSZeEpLaDjQNjmP8Ir6ivOSW54NsDy7DMuzs8LLQjVCMN6a-FqoeZIS_zCBYQ2kwZea7SF3F-mhxhS_xn1W3edMm9RDfpNl1By0FJwEUOv_o7sPwLBqnGVGGjW4FGcUSg3wJnExxslzYTUJJ7BeUyeKSc84ZDSOMy55dooS-0glz47Vj4C-4PLz7bf7tEvaOJSpDEOdDVaKjF13JjtdUah1G5GEqehhZly8bPpIyoRPFAzG-PjjebWyfu3wmqqFz8Q0NG-bVOx98TE-beAAG_Tb20PW9O1KGxm86bUm9os2stWEh2yGHOvwK_aWHyzWhNXhTKyRNrEOskp3ZePAH1MBEWzHSChlFTiebUw_2hHNVuZjQHaie5MzsQiLDXiPLi6_pEE-UA3O_p0I2khhpOXP4HHMKU6GMFC3uHEDDS5nd_df80we8zS82Y_-THMfX9_3lfRMthkr6Sa7NsIPDi9bZJULwGnaZIr7-QnYl705-u7snypXNUrbbSk_kZ5qoXiDNRZqIabEvhSq8DvBQcthtfVGLSpwEXPVNtJpPPx0Dqe7fyGB9vk)
+
+### Main Application 
+[![](https://mermaid.ink/img/pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNq9WG1v2zYQ_iuCPgxu5wDtsE8GXMCbnTVAkhmJg22AAYKRKJuLRLIklcTr8t93pChZIqnEHYYZCEwf7453D--N-ZpmPCfpLM1KrNSS4p3E1ZYl8MmpJJmmnCWXNw3F8iQLIZKvDcF8vkeIMqoRmihSFu96G7JmfdrLljULhiuiBM5IssQa93U1BxjqJcc5kf098zkTmErl0XJgV0Sjxl4uD8P9oX3TJGCfJpl6RALr_TtPsgQjnBSt8I6ggpbEZ0KGC9n9gNdqRZowxWVMeSOGjFetLMvJcyjxclzG0AJ_Aqjusc72SNG_iL9RFwWRsR0DjXWHyLcxdIzTpKdv_uOHD0DoTp5_9L3OJMGaIHcJfsi8jEbKFWaAlFRhtFxB_JZuOwAh46ygO4-4-n29urm4Wl1vbtHy4sbb_fwH7K4XN4ur1WZ1c4vWi83n19CI3mtzrkOr-RGNsB0EIn7EtMT3EC3ZnmQPglOmVVS1kLwSGhVc9lijnEavvaQuyvs3pw-CjFwMZjm6r2mZo8rgqibD2_HB30gMULDdCP5-3LzHcqfg6_3Dk1kFNtRSEqYReRZE0sosNXwpjSsRddMZ3eMf-uvza2Nu45mzqKG0BQB-w2m9n0PNcJUd7JZhfs1ZgCSXwKVAMVimHT6RQPehXD3issam3v43YNoQIAWuSwC0023NbuNy6ExMQUEZLpHCj-QbBC1770hJFBihnLCncppUiiDDTAIXnA4yvLHhDXm2TBOr2dZVFbWufz1HI0cqUazgnkNhH7sia02TeeSZKnC6C8ggdrk4NJyaQ0qXUEsnitcyI02o5cZPWJ1m1J0i8oKJWo9Z9qUm8oAOAArjk6aQRIuR7fiTk2qyoM8_wF9Ykm1ViFTjnKoMsgkCAABBXEByQ5OQfs3ubtTb2BGGdphB41H-DKDqqsLg35OkOlAIckSaI8foJ5iChCQFfY44FDPHWFp-jO0MIIhIaa4hO0JBP_k722fJL-0SYqavfZYs-z8hMwYgDVPHehcvl0oT0U0nEGFNckEiQtUhGtTCvi9ZUD0osLlyiWsWRkCFtdUmbiHJl9fr5MCpIMRspfBoBk3E7_-EPPTMzPkTU9BcSjKBcQ1AMdZBHEwTLER5QHaSYVxW842sg0Lf65PRbjMMd2NF24RN2EDrKhGvNSDqKO5OSe7Ip2V-d_0nYfHr3WZ9t0E_f15cX68ub73dy8XVT8vF_wRfLV6TzSUXAMP8HJfqm5E_ZraPuo-xzaRu3YT0ScXvTtMyMo1emNxYS54RpfgbLdy3GiIih44LTaN7O5h22T4joGdF543WJdf0nLcWnEHGuldF66VHbBjNacbH9hHjOjTomm9Tm8rb9LSwXC_Pf7N1JsCgs_eeP9t582lP1QO8IETJ9eQ4DbiKEB9NnAqQ1Nw8Wf-NsMgLyELBpZ4EU0Q3d_bnk8jw0mA-EjHN0ryXz84-BbPyLGnGV5V8Z54IWvJSDSXCkTAu00j5-o2G9nE4S2pFnPZQa4yz4e09xQ2TF90zGFIEYblK-Bs2OB2nmeExN-yDZ57h7I9hfb0xE8Z44zbEuMd0__1paNkMEmkPbU2rpIAha_yYNwXHvWnHq9PgDybDodhrQIwfFOc_5vypEm8GVFzsJJ_aLIowHyMgCKtR7h7CbawOJpEgBh3XsT-PcbwKwql4t0ZuWTpNKyIrTPN0ltriC6V7TyqyTWewzLF82KZb9gJ8uNb89sCydFaYNjtNawEvEuL-DeioL_8Ax7dT8g)
+
+### Post-processing 
+[![](https://mermaid.ink/img/pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNp9kcFqwzAMhl_F6LQx7wVyHoXdCtnRYDRbbcVsOdjOoSt59zppaEsY0-lH-n7J_L6AS56gAxewlA_GY8ZoRK21dNU-lbrPyVEpu8-vvmc5BlKXBzbXexrrMFbrOW8GHivaeh5o02f5k3-zloWrtS-FwkGrO6bV44RW962vG7snSTli4F-yM7SumeU_LpfiNwtZd0IRCuXJtUWHWxQL8TSbbtIIaIjUXsC-5bqkZKCeKJKBrkmP-ceAkalxONbUn8VBd8BQSMM4tIu0_sPana6igoCi)
+
+---
+
+## Visual Studio Code
+
+ While not mandatory, it is a versatile Integrated Development Environment (IDE) that offers a Docker extension, simplifying many Docker-related tasks.
+
+Download Visual Studio Code [here](https://code.visualstudio.com/download).
+
+### Essential Extensions for VS Code
+1. [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) - Containers: Enables containers to open in a dedicated VS Code window.
+2. [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) - Enhances VS Code's integration with Docker.
+3. [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) - Provides support for Python development.
+
+### Container Attachment
+Once you've set up Docker using this [guide](https://github.com/declan76/pix2pix#docker).
+
+Attach the Docker container to VS Code for an integrated development experience. Right-click on the container and choose "Attach Visual Studio Code." This opens a new VS Code window linked to the container. 
+**Note**: The Python extension must be reinstall inside this window due to the container's isolated environment.
+
+**Opening the Application**: After attaching the container, select "Open Folder" in VS Code and navigate to the /app directory. This is the root directory for the application. 
 
 ## Docker 
-**Visual Studio Code**:  While not mandatory, it is a versatile Integrated Development Environment (IDE) that offers a Docker extension, simplifying many Docker-related tasks.
-- Download Visual Studio Code [here](https://code.visualstudio.com/download).
-- Access its Docker extension [here](https://code.visualstudio.com/docs/containers/overview).
 
-**Important Note**: When running the code inside a Docker container, please ensure that you use relative paths for any file or directory references. Absolute paths that work on your local machine might not be recognized correctly within the Docker container environment. Using relative paths will ensure consistent behavior and prevent potential file not found errors.
+### An Overview of Docker Containerization
+Docker offers a platform for containerization, allowing developers to encapsulate an application and its dependencies into a singular unit, termed a 'container'. This ensures uniformity in application behavior across diverse environments, from local development machines to production servers.
+
+#### Isolation Principle
+Containers operate in an isolated environment on the host system. This encapsulation ensures that processes within a container remain segregated from the host system and other containers. It's analogous to compartmentalizing applications within distinct, secure silos on a single machine.
+
+#### File Integration and Access
+To utilize resources from the host system within a Docker container, one must explicitly transfer them into the container's filesystem. Once integrated, these resources are accessed using container-relative paths, such as /app/path/to/file, ensuring consistent referencing irrespective of the container's deployment environment.
+
+--- 
 
 ### Installation
 #### Ubuntu and Debian-based Linux Distros
@@ -332,3 +414,56 @@ You can manage Docker containers and images either through your IDE or the termi
     ```
     docker rmi [IMAGE_NAME/ID]
     ```
+
+--- 
+
+## Training 
+Training the Pix2Pix model is a straightforward process. Follow the steps below to ensure a smooth training experience.
+
+### I. Running the Training Script
+To initiate the training process, run the [main.py](https://github.com/declan76/pix2pix/blob/main/src/main.py) script:
+```
+/usr/bin/python3 /app/src/main.py
+```
+When prompted, select 't' for training mode.
+
+### II. Model Configuration
+The model's hyperparameters and configurations are stored in a YAML file, which allows for easy adjustments without altering the main codebase.
+
+Location: The configuration file can be found at [hyperparameters.yaml](https://github.com/declan76/pix2pix/blob/main/config/hyperparameters.yaml).
+
+**Key Parameters**:
+- **BUFFER_SIZE**: This parameter determines the number of images loaded into memory at once. It's essential for the Pix2Pix model as it affects the shuffling of the dataset. A larger buffer size ensures better shuffling at the cost of increased memory usage. Defualt value is 400.
+- **BATCH_SIZE**: This parameter specifies the number of training examples utilized in one iteration. A batch size of 1 means that the model is trained using one example at a time. Default value is 1.
+- **STEPS**: The training process will halt once this number of steps is reached. It essentially defines the total number of training iterations. Default value is 200,000.
+- **SAVE_FREQ**: This parameter determines the frequency (in terms of steps) at which the model's state is saved as a checkpoint and a sample image is generated. For instance, a value of 1000 means a checkpoint is saved every 1000 steps. Default value is 5000.
+
+### III. Training Progress
+- **Terminal Output**: During training, the terminal provides detailed information about the model's progress. Every 1000 steps, a comprehensive update is printed, including loss values and other relevant metrics. Additionally, a dot is printed every 10 steps as a visual indicator of ongoing progress.
+- **Storage**: All relevant training data, including logs, checkpoints, generated images, the dataset used, and the current configuration file, are stored in a timestamped directory: experiment/{datetime}.
+- **Safe Termination**: If you need to interrupt the training process, use ctrl + c. This ensures that the current model state is saved as a checkpoint before the program exits.
+
+### IV. Monitoring with TensorBoard
+
+TensorBoard provides real-time visualization and monitoring of the training process, offering insights into various metrics and model performance.
+
+- **Activation**:
+    Open a new terminal. Run the following command:
+    ```
+    tensorboard --logdir=path/to/logs/fit
+    ```
+    Open a web browser and navigate to http://localhost:6006.
+
+- **Further Reading**: For a more in-depth guide on using TensorBoard to visualize your model's performance, refer to [this documentation](https://pytext.readthedocs.io/en/master/visualize_your_model.html).
+
+---
+
+## Evaluation
+The evaluation process is similar to training. Follow the steps below to ensure a smooth evaluation experience.
+
+### Running the Evaluation Script
+To initiate the evaluation process, run the [main.py](https://github.com/declan76/pix2pix/blob/main/src/main.py) script:
+```
+/usr/bin/python3 /app/src/main.py
+```
+When prompted, select 'e' for evaluation mode.
