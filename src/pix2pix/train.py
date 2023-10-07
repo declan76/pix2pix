@@ -4,7 +4,7 @@ import tensorflow as tf
 from IPython import display
 from prettytable import PrettyTable
 from pix2pix.generator import Generator
-from utils.fits_handler import generate_images
+from utils.image_processor import ImageProcessor
 from pix2pix.discriminator import Discriminator
 
 class Trainer:
@@ -123,7 +123,7 @@ class Trainer:
                 # Save the model and generate sample image every save_freq steps
                 if (step+1) % save_freq == 0 or (step+1) == steps:
                     self.checkpoint.save(file_prefix=self.checkpoint_prefix)
-                    generate_images(self.generator, example_input, example_target, step, experiment_dir)
+                    ImageProcessor().generate_images(self.generator, example_input, example_target, step, experiment_dir)
 
         except KeyboardInterrupt:
             print("\nTraining interrupted by user. Saving current progress...")

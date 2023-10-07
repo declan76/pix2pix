@@ -10,7 +10,7 @@ from utils.pdf_writer import PDFWriter
 from data.data_loader import DataLoader
 from managers.file_manager import FileManager
 from managers.model_manager import ModelManager
-from utils.fits_handler import generate_images
+from utils.image_processor import ImageProcessor
 from managers.user_input_manager import UserInputManager
 
 class EvaluationManager(ModelManager):
@@ -114,7 +114,7 @@ class EvaluationManager(ModelManager):
                 prediction_np   = prediction[0].numpy()
                 fits.writeto(fits_path, prediction_np, overwrite=True)
 
-                generate_images(generator, input, target, taget_name, save_images_path, mode='eval')
+                ImageProcessor().generate_images(generator, input, target, taget_name, save_images_path, mode='eval')
 
         # Create temp folder to store images for PDF report
         os.makedirs("temp", exist_ok=True)
@@ -127,7 +127,7 @@ class EvaluationManager(ModelManager):
         # Generate images for these files to be used in the PDF report
         for rank, (file_name, mse) in enumerate(top_3_files + [worst_file]):
             _, input, target = next(filter(lambda x: x[0].numpy()[0].decode('utf-8') == file_name, test_dataset))
-            image_path       = generate_images(generator, input, target, file_name, "temp", mode='eval')
+            image_path       = ImageProcessor().generate_images(generator, input, target, file_name, "temp", mode='eval')
             images.append((rank, image_path))
 
         avg_mse = sum(mse_values.values()) / len(mse_values)

@@ -2,7 +2,7 @@ import pathlib
 import pandas as pd
 import tensorflow as tf
 
-from utils.fits_handler import read_fits
+from utils.image_processor import ImageProcessor
 
 class DataLoader:
     """
@@ -49,7 +49,7 @@ class DataLoader:
         - data: Data read from the FITS image file.
         """
         image_file_path = image_file_path_tensor.numpy().decode('utf-8')
-        data            = read_fits(image_file_path)
+        data            = ImageProcessor().read_fits(image_file_path)
         if data is None:
             print(f"Data is None for file: {image_file_path}")
         return data

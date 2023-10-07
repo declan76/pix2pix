@@ -3,7 +3,7 @@ import numpy as np
 
 from astropy.io import fits
 
-class PostProcessFITS:
+class PostProcessFITSSingle:
     """
     A class to post-process FITS files. 
     Takes the 3D FITS files from the input directory, combines the 3 channels into a single channel, and denormalizes the data.
@@ -98,5 +98,5 @@ if __name__ == "__main__":
             "Enter the type of FITS file (1 for magnetogram, 2 for intensity, 3 for divergence): "
         )
     )
-    post_processor = PostProcessFITS(input_dir, output_dir, data_type)
+    post_processor = PostProcessFITSSingle(input_dir, output_dir, data_type)
     post_processor.process()

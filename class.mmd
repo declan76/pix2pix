@@ -1,0 +1,214 @@
+classDiagram
+    namespace Post-Processing {
+        class PostProcessFITSSingle {
+            -output_dir
+            -data_type
+            -input_dir
+            +__init__(self, input_dir, output_dir, data_type)
+            +denormalize_data(self, data, data_type)
+            +combine_channels(self, data)
+            +process(self)
+        }
+    }
+
+    namespace Pre-Processing {
+        class Augmentation {
+            +__init__(self)
+        }
+        
+        class PairFiles {
+            -output_file
+            -directory
+            -save_directory
+            +__init__(self, directory, save_directory, output_file="pairs.csv")
+            +extract_ar_and_ti(self, filename)
+            +get_file_pairs(self)
+            +write_to_csv(self)
+            +run(self)
+        }
+        
+        class DataSplitter {
+            -dataset_path
+            -test_path
+            -csv_path
+            -train_ratio
+            -train_path
+            +__init__(self, dataset_path, train_path, test_path, csv_path, train_ratio=0.85)
+            +_clear_directory(directory)
+            +split(self)
+            +from_user_input(cls)
+        }
+
+        class PreProcessFITSSingle {
+            -output_dir
+            -data_type
+            -input_dir
+            +__init__(self, input_dir, output_dir, data_type)
+            +distance_to_disk_centre(self, crlt_obs, crln_obs, crlt_ref, crln_ref)
+            +remove_2dplane(self, array)
+            +read_fits(self, file_path)
+            +duplicate_data(self, data, channels=3)
+            +normalize_data(self, data, header=None)
+            +resize_data(self, data, target_shape=(256, 256))
+            +process_directory(self)
+            +run(self)
+        }
+
+        class PreProcessFITSTriple {
+            + distance_to_disk_centre(crlt_obs, crln_obs, crlt_ref, crln_ref) : float
+            + remove_2dplane(array) : ndarray
+        }
+    }
+    
+    class App {
+        +__init__(self)
+        +run(self)
+    }
+
+    namespace Data {
+        class DataLoader {
+            -pairs
+            -dataset_directory
+            +__init__(self, dataset_directory, csv_path)
+            +load(self, image_file)
+            +_load_image(self, image_file_path_tensor)
+            +load_image_pair(self, index_tensor)
+        }
+        
+        class Dataset {
+            -batch_size
+            -buffer_size
+            -data_loader
+            +__init__(self, data_loader, buffer_size=400, batch_size=1)
+            +create_dataset(self)
+        }
+    }
+
+    namespace Managers {
+        class ModelManager {
+            -config
+            -EXPERIMENTS_DIR
+            -HYPERPARAMETERS_PATH
+            +__init__(self)
+            +load_config(self, config_path)
+            +get_available_checkpoints(self)
+            +prompt_for_checkpoint(self)
+            +get_data_directory(self, data_type)
+            +create_and_build_models()
+        }
+
+        class TrainingManager {
+            +__init__(self, *args, **kwargs)
+            +current_experiment_timestamp(self)
+            +create_experiment_directory(self)
+            +train_model(self, train_csv_path, test_csv_path, experiment_dir, checkpoint_path=None)
+            +orchestrate_training(self)
+        }
+
+        class EvaluationManager {
+            +__init__(self, *args, **kwargs)
+            +get_default_evaluation_path(self, checkpoint_path)
+            +get_final_save_path(self, checkpoint_path)
+            +save_evaluation_results(self, final_save_path, mse_values)
+            +evaluate_model(self, test_csv_path, checkpoint_path, save_images_path)
+            +orchestrate_evaluation(self)
+        }
+        
+        class FileManager {
+            +check_data_exists(directory)
+            +copy_data_to_folder(source_dir, dest_dir)
+        }
+        
+        class UserInputManager {
+            +query_yes_no(prompt)
+            +get_action()
+        }
+    }
+
+    namespace pix2pix {
+        class Trainer {
+            -discriminator_optimizer
+            -checkpoint
+            -gen_gan_loss
+            -summary_writer
+            -generator
+            -generator_optimizer
+            -checkpoint_prefix
+            -disc_loss
+            -gen_l1_loss
+            -discriminator
+            -gen_total_loss
+            +__init__(self, generator: Generator, discriminator: Discriminator, summary_writer, checkpoint_prefix)
+            +train_step(self, input_image, target, step)
+            +fit(self, train_ds, test_ds, steps, experiment_dir, save_freq)
+        }
+
+        class Discriminator {
+            -model
+            -loss_object
+            +downsample(filters, size, apply_batchnorm=True)
+            +build_model(self)
+            +discriminator_loss(self, disc_real_output, disc_generated_output)
+        }
+        
+        class Generator {
+            -model
+            -OUTPUT_CHANNELS
+            -LAMBDA
+            -loss_object
+            +downsample(filters, size, apply_batchnorm=True)
+            +upsample(filters, size, apply_dropout=False)
+            +build_model(self)
+            +generator_loss(self, disc_generated_output, gen_output, target)
+        }
+    }
+
+    namespace Utils {
+        class ImageProcessor {
+            +__init__(self)
+            +read_fits(file_path, file_path_str=None)
+            +generate_images(self, model, input_image_tensor, target_image_tensor, input_filename, image_path, mode="train")
+        }
+        
+        class PDFWriter {
+            +generate_box_and_whisker_plot(mse_values, save_path)
+            +generate_histogram_plot(mse_values, save_path)
+            +generate_pdf_report(checkpoint_path, timestamp, mse_values, final_save_path, images)
+        }
+    }
+
+
+    App --> TrainingManager : creates & controls
+    App --> EvaluationManager : creates & controls
+
+    TrainingManager --> Dataset : uses
+    EvaluationManager --> Dataset : uses
+
+    DataLoader --> ImageProcessor : depends on
+    TrainingManager --> DataLoader : uses
+    EvaluationManager --> DataLoader : uses
+
+    ModelManager --> FileManager : uses
+    TrainingManager --> FileManager : uses
+    EvaluationManager --> FileManager : uses
+
+    TrainingManager --|> ModelManager : inherits from
+    EvaluationManager --|> ModelManager : inherits from
+
+    TrainingManager --> Trainer : depends on
+    TrainingManager --> UserInputManager : depends on
+
+    EvaluationManager --> Trainer : depends on
+    EvaluationManager --> PDFWriter : depends on
+    EvaluationManager --> ImageProcessor : depends on
+    EvaluationManager --> UserInputManager : depends on
+
+    App --> UserInputManager : uses
+    ModelManager --> UserInputManager : uses
+
+    Trainer --> Discriminator : uses
+    Trainer --> Generator : uses
+    Trainer --> ImageProcessor : depends on
+
+    EvaluationManager --> PDFWriter : uses
+
