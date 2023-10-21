@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 
 from fpdf import FPDF
 
+"""
+A class to generate PDF reports based on Mean Squared Error (MSE) values.
+"""
 class PDFWriter:
-    """
-    A class to generate PDF reports based on Mean Squared Error (MSE) values.
-    """
+
     def generate_box_and_whisker_plot(mse_values, save_path):
         """
         Generate a box and whisker plot for the given MSE values.
@@ -26,12 +27,13 @@ class PDFWriter:
         mse_list = list(mse_values.values())
         
         # Boxplot with custom colors for quartiles
-        boxprops     = dict(linestyle='-', linewidth=1, color='black')
-        medianprops  = dict(linestyle='-', linewidth=1, color='red')
+        boxprops = dict(linestyle='-', linewidth=1, color='black')
+        medianprops = dict(linestyle='-', linewidth=1, color='red')
         whiskerprops = dict(linestyle='-', linewidth=1, color='blue')
-        capprops     = dict(linestyle='-', linewidth=1, color='green')
+        capprops = dict(linestyle='-', linewidth=1, color='green')
         
-        bp = plt.boxplot(mse_list, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskerprops, capprops=capprops)
+        bp = plt.boxplot(mse_list, boxprops=boxprops, medianprops=medianprops, 
+                        whiskerprops=whiskerprops, capprops=capprops)
         
         # Add grid lines to y-axis
         plt.grid(axis='y')
@@ -40,15 +42,30 @@ class PDFWriter:
         plt.yticks([tick for tick in plt.yticks()[0]], ['{:.6f}'.format(tick) for tick in plt.yticks()[0]])
         
         # Compute statistics
-        min_val    = np.min(mse_list)
-        q1_val     = np.percentile(mse_list, 25)
+        min_val = np.min(mse_list)
+        q1_val = np.percentile(mse_list, 25)
         median_val = np.median(mse_list)
-        q3_val     = np.percentile(mse_list, 75)
-        max_val    = np.max(mse_list)
+        q3_val = np.percentile(mse_list, 75)
+        max_val = np.max(mse_list)
         
-        # Display the values for min, max, median, Q1, and Q3 beside their respective lines
-        for line, value in zip(bp['medians'] + bp['whiskers'] + bp['caps'], [median_val, min_val, q1_val, q3_val, max_val]):
-            plt.text(1.05, line.get_ydata()[0], '{:.6f}'.format(value), va='center')
+        # Correctly identify the lines for min and max
+        min_line = bp['whiskers'][0].get_ydata()[1]  # The y-coordinate for min
+        max_line = bp['whiskers'][1].get_ydata()[1]  # The y-coordinate for max
+
+        # Correctly identify the y-coordinates for Q1 and Q3
+        q1_y = bp['boxes'][0].get_ydata()[0]  # The y-coordinate for Q1
+        q3_y = bp['boxes'][0].get_ydata()[2]  # The y-coordinate for Q3
+
+        # Annotate Q1 and Q3 directly using their values and positions
+        plt.text(1.05, q1_y, '{:.6f}'.format(q1_val), va='center', ha='center')
+        plt.text(1.05, q3_y, '{:.6f}'.format(q3_val), va='center', ha='center')
+
+        # Annotate min and max using their lines
+        plt.text(1.05, min_line, '{:.6f}'.format(min_val), va='center', ha='center')
+        plt.text(1.05, max_line, '{:.6f}'.format(max_val), va='center', ha='center')
+
+        # Annotate median
+        plt.text(1.05, bp['medians'][0].get_ydata()[0], '{:.6f}'.format(median_val), va='center', ha='center')
         
         plt.title("Box and Whisker Plot for MSE Values")
         plt.ylabel("MSE Value")
@@ -59,7 +76,8 @@ class PDFWriter:
         plt.close()
         
         return image_path
-    
+
+
 
     def generate_histogram_plot(mse_values, save_path):
         """
